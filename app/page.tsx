@@ -366,7 +366,7 @@ function ChapterCard({
         <>
           <div className="actions">
             <button className="btn-primary" onClick={() => onStart(chapter.id)}>
-              この章を始める
+              始める
             </button>
             <button
               className="btn-secondary"
@@ -376,15 +376,15 @@ function ChapterCard({
               {progress
                 ? `保存中 ${progress.done} / ${progress.total}`
                 : saved
-                  ? "端末から削除"
-                  : "オフライン用に保存"}
+                  ? "保存を削除する"
+                  : "オフラインに保存する"}
             </button>
             <button
               className="btn-secondary"
               onClick={downloadNotes}
               disabled={progress !== null}
             >
-              解説をダウンロード
+              解説をダウンロードする
             </button>
           </div>
           <p className="muted" style={{ margin: 0, fontSize: 12 }}>
@@ -646,7 +646,7 @@ function ResultView({
       )}
 
       <button className="btn-primary" onClick={onNext}>
-        {position + 1 >= total ? "章を終える" : "次の問題へ"}
+        {position + 1 >= total ? "章を終える" : "次の問題に進む"}
       </button>
     </div>
   );
@@ -696,7 +696,7 @@ function ChapterDone({
 
       <div className="actions">
         <button className="btn-primary" onClick={onRestart}>
-          もう一度この章をやる
+          もう一度始める
         </button>
         <button className="btn-secondary" onClick={onBack}>
           章を選び直す
