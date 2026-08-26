@@ -435,7 +435,9 @@ function QuestionView({
 }) {
   return (
     <div className="stack-xl">
-      <section className="card stack-md">
+      {/* 出題画面はカードで囲まない。この画面には要素が1組しかなく、
+          何かと区切るための枠が要らない。 */}
+      <section className="stack-md">
         <div className="row" style={{ alignItems: "baseline", gap: 8 }}>
           <span className="question-no">第{position + 1}問</span>
           <span className="label">
