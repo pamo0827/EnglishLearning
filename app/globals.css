@@ -107,6 +107,15 @@ button:not(:disabled):hover {
   filter: brightness(0.94);
 }
 
+/* ボタン内にアイコンを置くときの間隔 */
+.btn-primary svg,
+.btn-secondary svg {
+  width: 13px;
+  height: 13px;
+  margin-right: 7px;
+  flex: 0 0 auto;
+}
+
 .btn-primary {
   background: var(--color-primary);
   color: var(--color-on-primary);

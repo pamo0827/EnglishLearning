@@ -366,32 +366,36 @@ function ChapterCard({
         <>
           <div className="actions">
             <button className="btn-primary" onClick={() => onStart(chapter.id)}>
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M8 5.5v13a1 1 0 0 0 1.5.87l11-6.5a1 1 0 0 0 0-1.74l-11-6.5A1 1 0 0 0 8 5.5Z" />
+              </svg>
               始める
             </button>
-            <button
-              className="btn-secondary"
-              onClick={saved ? remove : download}
-              disabled={progress !== null}
-            >
-              {progress
-                ? `ダウンロード中 ${progress.done} / ${progress.total}`
-                : saved
-                  ? "音声を削除する"
-                  : "音声をダウンロードする"}
-            </button>
-            <button
-              className="btn-secondary"
-              onClick={downloadNotes}
-              disabled={progress !== null}
-            >
-              解説をダウンロードする
-            </button>
           </div>
-          <p className="muted" style={{ margin: 0, fontSize: 12 }}>
-            音声はアプリ内に保存され、電波が無くても練習できます。解説は正解英文と
-            日本語訳を含む HTML ファイルとして端末に保存されるので、練習を終えてから
-            開いてください。
-          </p>
+
+          <div className="stack-sm">
+            <div className="label">オフラインでダウンロード</div>
+            <div className="actions">
+              <button
+                className="btn-secondary"
+                onClick={saved ? remove : download}
+                disabled={progress !== null}
+              >
+                {progress
+                  ? `ダウンロード中 ${progress.done} / ${progress.total}`
+                  : saved
+                    ? "音声を削除する"
+                    : "音声をダウンロードする"}
+              </button>
+              <button
+                className="btn-secondary"
+                onClick={downloadNotes}
+                disabled={progress !== null}
+              >
+                解説をダウンロードする
+              </button>
+            </div>
+          </div>
         </>
       ) : (
         <div className="chip" style={{ color: "var(--color-on-surface-muted)" }}>
