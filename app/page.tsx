@@ -348,18 +348,11 @@ function ChapterCard({
 
   return (
     <section className="card stack-md">
-      <div className="row-between">
-        <div>
-          <div style={{ fontWeight: 600, fontSize: 17 }}>{chapter.title}</div>
-          <div className="label" style={{ marginTop: 4 }}>
-            全{chapter.questionCount}問
-          </div>
+      <div>
+        <div style={{ fontWeight: 600, fontSize: 17 }}>{chapter.title}</div>
+        <div className="label" style={{ marginTop: 4 }}>
+          全{chapter.questionCount}問
         </div>
-        {saved && (
-          <span className="chip" style={{ color: "var(--color-success)" }}>
-            ✓ ダウンロード済み
-          </span>
-        )}
       </div>
 
       {chapter.ready ? (
@@ -377,22 +370,23 @@ function ChapterCard({
             <div className="label">オフラインでダウンロード</div>
             <div className="actions">
               <button
-                className="btn-secondary"
+                className={`btn-secondary${saved ? " is-done" : ""}`}
                 onClick={saved ? remove : download}
                 disabled={progress !== null}
+                title={saved ? "もう一度押すと端末から削除します" : undefined}
               >
                 {progress
                   ? `ダウンロード中 ${progress.done} / ${progress.total}`
                   : saved
-                    ? "音声を削除する"
-                    : "音声をダウンロードする"}
+                    ? "✓ ダウンロード済み"
+                    : "音声"}
               </button>
               <button
                 className="btn-secondary"
                 onClick={downloadNotes}
                 disabled={progress !== null}
               >
-                解説をダウンロードする
+                解説
               </button>
             </div>
           </div>

@@ -145,6 +145,13 @@ button:not(:disabled):hover {
   justify-content: center;
 }
 
+/* ダウンロード済みの状態。もう一度押すと削除できることを色で示す */
+.btn-secondary.is-done {
+  background: transparent;
+  color: var(--color-success);
+  box-shadow: inset 0 0 0 1px var(--color-success);
+}
+
 /* --- 再生ボタン：画面内で最大の要素 --- */
 .play {
   display: flex;
