@@ -165,18 +165,20 @@ button:not(:disabled):hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 132px;
-  height: 132px;
+  width: 68px;
+  height: 68px;
   border-radius: var(--rounded-full);
   background: var(--color-primary);
   color: var(--color-on-primary);
-  /* margin: 0 auto だと .stack-md の margin-top を打ち消し、上だけ余白が消える。
-     画面の主役なので上下を明示して、周囲より広く取る。 */
-  margin: var(--space-lg) auto;
+  /* margin に 0 を含めると .stack-md の margin-top を打ち消してしまう。
+     上下は明示し、周囲の要素間より広く取る。 */
+  margin: var(--space-lg) 0;
 }
 .play svg {
-  width: 46px;
-  height: 46px;
+  width: 26px;
+  height: 26px;
+  /* 三角形は重心が左に寄るため、光学的な中心に合わせて少しずらす */
+  margin-left: 3px;
 }
 .play.is-playing {
   background: var(--color-secondary);
@@ -191,7 +193,8 @@ textarea {
   resize: vertical;
   background: var(--color-surface-sunken);
   color: var(--color-on-surface);
-  border: 1px solid var(--color-outline);
+  /* 枠線は置かない。地の色の差だけで入力欄と分かる */
+  border: none;
   border-radius: var(--rounded-md);
   padding: var(--space-md);
   font-family: var(--font-sans);
@@ -339,12 +342,12 @@ textarea:focus {
   }
 
   .play {
-    width: 112px;
-    height: 112px;
+    width: 60px;
+    height: 60px;
   }
   .play svg {
-    width: 40px;
-    height: 40px;
+    width: 23px;
+    height: 23px;
   }
 
   /* iOS で入力時に拡大されないよう 16px を下回らせない */

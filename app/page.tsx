@@ -435,11 +435,8 @@ function QuestionView({
 }) {
   return (
     <div className="stack-xl">
-      <section className="card stack-md" style={{ textAlign: "center" }}>
-        <div
-          className="row"
-          style={{ justifyContent: "center", alignItems: "baseline", gap: 8 }}
-        >
+      <section className="card stack-md">
+        <div className="row" style={{ alignItems: "baseline", gap: 8 }}>
           <span className="question-no">第{position + 1}問</span>
           <span className="label">
             / {total}
