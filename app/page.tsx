@@ -357,7 +357,7 @@ function ChapterCard({
         </div>
         {saved && (
           <span className="chip" style={{ color: "var(--color-success)" }}>
-            ✓ 保存済み
+            ✓ ダウンロード済み
           </span>
         )}
       </div>
@@ -374,10 +374,10 @@ function ChapterCard({
               disabled={progress !== null}
             >
               {progress
-                ? `保存中 ${progress.done} / ${progress.total}`
+                ? `ダウンロード中 ${progress.done} / ${progress.total}`
                 : saved
-                  ? "保存を削除する"
-                  : "オフラインに保存する"}
+                  ? "音声を削除する"
+                  : "音声をダウンロードする"}
             </button>
             <button
               className="btn-secondary"
@@ -388,7 +388,9 @@ function ChapterCard({
             </button>
           </div>
           <p className="muted" style={{ margin: 0, fontSize: 12 }}>
-            解説には正解英文と日本語訳が含まれます。練習を終えてから開いてください。
+            音声はアプリ内に保存され、電波が無くても練習できます。解説は正解英文と
+            日本語訳を含む HTML ファイルとして端末に保存されるので、練習を終えてから
+            開いてください。
           </p>
         </>
       ) : (
