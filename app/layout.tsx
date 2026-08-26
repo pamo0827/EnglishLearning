@@ -25,11 +25,12 @@ export default function RootLayout({
         {/*
           next/script ではなく素の script タグを使う。next/script はタグを
           クライアント側で生成するため、beacon が読む data-cf-beacon 属性が
-          静的 HTML に現れない。Cloudflare が配布する形をそのまま置く。
+          静的 HTML に現れない。属性は Cloudflare が配布するスニペットに揃えてある
+          （type="module" は defer と同じく解析をブロックしない）。
         */}
         {CF_BEACON_TOKEN !== "" && (
           <script
-            defer
+            type="module"
             src="https://static.cloudflareinsights.com/beacon.min.js"
             data-cf-beacon={JSON.stringify({ token: CF_BEACON_TOKEN })}
           />
