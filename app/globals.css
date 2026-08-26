@@ -56,6 +56,14 @@ main {
   padding: var(--space-xl) var(--space-lg) var(--space-xxl);
 }
 
+/* 問題番号。画面内の現在地を示すので label より大きく扱う */
+.question-no {
+  font-size: 22px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
 /* DESIGN.md の typography.display */
 .app-title {
   font-size: 30px;
@@ -162,7 +170,9 @@ button:not(:disabled):hover {
   border-radius: var(--rounded-full);
   background: var(--color-primary);
   color: var(--color-on-primary);
-  margin: 0 auto;
+  /* margin: 0 auto だと .stack-md の margin-top を打ち消し、上だけ余白が消える。
+     画面の主役なので上下を明示して、周囲より広く取る。 */
+  margin: var(--space-lg) auto;
 }
 .play svg {
   width: 46px;

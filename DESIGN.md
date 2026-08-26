@@ -43,6 +43,12 @@ typography:
     fontWeight: 600
     lineHeight: "1.3"
     letterSpacing: "0.08em"
+  question-number:
+    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif"
+    fontSize: "22px"
+    fontWeight: 650
+    lineHeight: "1.2"
+    letterSpacing: "-0.01em"
   transcript:
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
     fontSize: "21px"
@@ -87,6 +93,7 @@ components:
     backgroundColor: "{colors.primary}"
     textColor: "{colors.on-primary}"
     rounded: "{rounded.full}"
+    margin: "{spacing.lg}"
   answer-input:
     backgroundColor: "{colors.surface-sunken}"
     textColor: "{colors.on-surface}"
@@ -167,6 +174,14 @@ components:
 ## Components
 
 再生ボタンは画面内で最大の**要素**にする。出題画面で最初に触るものが迷いなく分かることが最優先。
+
+**主役の要素は周囲より広い余白で囲う。** 再生ボタンの上下は `spacing.lg`（他の要素間は `md`）。
+なお、中央寄せに `margin: 0 auto` を使うと縦積みの `margin-top` を打ち消して上側の余白だけが
+消える。左右だけを auto にするか、上下を明示すること。
+
+問題番号は `typography.question-number` を使い、`label` より大きく扱う。章の何問目にいるかは
+練習中に最も知りたい情報で、`label` の 12px では小さすぎる。総数・難易度・レベルは
+`label` のまま添える。
 
 `button-primary` は全幅にしない。内容に合わせた幅に留め、`min-height` でタップ領域だけ
 確保する。全幅の帯は、画面に1つしかなくても「ここが主役だ」と主張しすぎて、再生ボタンと
