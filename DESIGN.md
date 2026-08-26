@@ -1,23 +1,23 @@
 ---
 colors:
-  primary: "#4f7cff"
+  primary: "#2f5fe0"
   on-primary: "#ffffff"
-  secondary: "#1c2333"
-  on-secondary: "#c9d3e8"
-  tertiary: "#22d3a6"
-  on-tertiary: "#04231b"
-  surface: "#0d1017"
-  surface-raised: "#151a25"
-  surface-sunken: "#090b11"
-  on-surface: "#e8edf7"
-  on-surface-muted: "#8b97ad"
-  outline: "#242c3d"
-  success: "#22d3a6"
-  on-success: "#04231b"
-  warning: "#f2c14e"
-  on-warning: "#2a1f04"
-  danger: "#ff6b6b"
-  on-danger: "#2a0808"
+  secondary: "#eaeef7"
+  on-secondary: "#2c3444"
+  tertiary: "#0d7a5c"
+  on-tertiary: "#ffffff"
+  surface: "#ffffff"
+  surface-raised: "#ffffff"
+  surface-sunken: "#f4f6fa"
+  on-surface: "#14171f"
+  on-surface-muted: "#5b6474"
+  outline: "#e0e5ef"
+  success: "#0d7a5c"
+  on-success: "#ffffff"
+  warning: "#8a5600"
+  on-warning: "#ffffff"
+  danger: "#c02a26"
+  on-danger: "#ffffff"
 typography:
   display:
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif"
@@ -119,13 +119,21 @@ components:
 出題画面は情報を極端に削り、採点画面ではじめて情報量を解放する。この非対称性がこのプロダクトの
 デザイン上の核であり、装飾はすべてそれに従属する。
 
-暗い面を基調にするのは審美的な理由ではなく、聴取中に視覚ノイズを減らすため。出題画面には
-テキストコンテンツがほとんど存在しないので、明るい面では空白が「未完成」に見えてしまう。
+白を基調にする。ライトのみで、ダークテーマは持たない。単一の見え方に決め切ることで、
+2つのパレットを整合させる手間を省き、コントラストの検証を一度で終わらせている。
+
+白地では地とカードが同じ色になるため、階層は境界線だけで表す。影は使わない。
 
 ## Colors
 
-`surface` を最下層、`surface-raised` をカード、`surface-sunken` を入力欄に使う。入力欄が
-沈んで見えることで、「ここに書き込む」というアフォーダンスが文字なしで伝わる。
+`surface` と `surface-raised` は同じ白で、両者は `outline` の境界線で区別する。
+`surface-sunken` だけをわずかに灰へ落とし、入力欄に使う。入力欄が沈んで見えることで、
+「ここに書き込む」というアフォーダンスが文字なしで伝わる。
+
+**採点結果の3色は白地で読めることが絶対条件になる。** 暗い面で使っていた明るい緑・黄・赤は
+白地ではコントラストが足りず、そのまま持ち越せない。`success` `warning` `danger` はいずれも
+白地で 4.5:1 以上（実測 5.31 / 6.16 / 5.83）を満たす暗い値に置いてある。色を変えるときは
+必ず測り直すこと。
 
 `primary` は再生と採点、つまりフローを前に進める操作にのみ使う。同一画面に primary の
 ボタンを2つ置かない。
@@ -148,8 +156,8 @@ components:
 
 ## Elevation & Depth
 
-影は使わず、`outline` の 1px ボーダーと背景色の差だけで階層を表す。暗い面では影がほぼ
-見えないうえ、影を足すと画面が濁って集中を削ぐ。
+影は使わず、`outline` の 1px ボーダーだけで階層を表す。白地に影を足すと、要素が浮いて
+視線を奪い、聞き取りへの集中を削ぐ。
 
 ## Shapes
 
@@ -179,6 +187,12 @@ components:
 
 音声が揃っていない章は選べない。中途半端に始められるより、準備中と分かるほうがよい。
 
+## Components（見出しと章）
+
+画面上部に出すのは「シャドーイング」の一語だけにする。アプリ名・説明文・章の副題・年月は
+いずれも練習の役に立たず、毎回同じものが目に入るだけの視覚ノイズになる。章は「第1章」の
+ように番号だけで呼ぶ。
+
 ## Do's and Don'ts
 
 - **Do** 出題画面の表示要素を、問題番号・再生ボタン・再生回数・再生速度・入力欄・採点ボタンの
@@ -193,3 +207,4 @@ components:
   回数は聞き込んだ量の記録であって、消費した資源ではない。
 - **Don't** 遅い速度を「初心者向け」などと価値付けしない。ラベルは倍率の事実だけを示す。
 - **Don't** 色だけで正誤を表現しない。
+- **Don't** 画面に説明文を常設しない。一度読めば分かることを毎回表示しない。

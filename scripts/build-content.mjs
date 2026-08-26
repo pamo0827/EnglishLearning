@@ -61,8 +61,6 @@ const chapters = CHAPTERS.map((c) => {
   return {
     id: c.id,
     title: c.title,
-    month: c.month,
-    description: c.description,
     questionCount: inChapter.length,
     // 音声が全問そろっている章だけ選択できるようにする
     ready: inChapter.length > 0 && inChapter.every((q) => q.audio),

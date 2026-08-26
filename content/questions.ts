@@ -36,14 +36,14 @@ export type Chapter = {
 export const CHAPTERS: Chapter[] = [
   {
     id: 1,
-    title: "第1章　日常の予定と言い訳",
+    title: "第1章",
     month: "2026-08",
     description:
       "約束、遅刻、断り。日常会話で最も頻度が高い場面を、連結と弱形を含む自然な速さで。",
   },
   {
     id: 2,
-    title: "第2章　言いよどみと本音",
+    title: "第2章",
     month: "2026-09",
     description:
       "はっきり言い切らない会話。前置き、ぼかし、言い直しが多く、音の省略も強くなる。",

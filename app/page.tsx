@@ -11,8 +11,6 @@ const asset = (p: string) => `${BASE}/${p}`;
 type ChapterMeta = {
   id: number;
   title: string;
-  month: string;
-  description: string;
   questionCount: number;
   ready: boolean;
 };
@@ -163,10 +161,12 @@ export default function Page() {
     <main className="stack-xl">
       <header className="row-between">
         <div>
-          <div className="label">English Listening Trainer</div>
-          <div className="muted" style={{ fontSize: 14 }}>
-            {chapter ? chapter.title : "聞こえたとおりに英語で書き取ってください"}
-          </div>
+          <div style={{ fontWeight: 600, fontSize: 17 }}>シャドーイング</div>
+          {chapter && (
+            <div className="muted" style={{ fontSize: 14 }}>
+              {chapter.title}
+            </div>
+          )}
         </div>
         {chapterId !== null && (
           <button className="btn-secondary" onClick={backToChapters}>
@@ -352,7 +352,7 @@ function ChapterCard({
         <div>
           <div style={{ fontWeight: 600, fontSize: 17 }}>{chapter.title}</div>
           <div className="label" style={{ marginTop: 4 }}>
-            {chapter.month} ・ 全{chapter.questionCount}問
+            全{chapter.questionCount}問
           </div>
         </div>
         {saved && (
@@ -361,10 +361,6 @@ function ChapterCard({
           </span>
         )}
       </div>
-
-      <p className="muted" style={{ margin: 0, fontSize: 14 }}>
-        {chapter.description}
-      </p>
 
       {chapter.ready ? (
         <>
@@ -749,13 +745,12 @@ ${a.hints
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(chapter.title)} 解説</title>
 <style>
-  :root { color-scheme: light dark; }
+  :root { color-scheme: light; }
   body {
     max-width: 720px; margin: 0 auto; padding: 40px 20px 80px;
     font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
-    line-height: 1.8; color: #1a1d24; background: #fff;
+    line-height: 1.8; color: #14171f; background: #fff;
   }
-  @media (prefers-color-scheme: dark) { body { color: #e8edf7; background: #0d1017; } }
   h1 { font-size: 24px; letter-spacing: -0.02em; }
   h2 { font-size: 17px; margin-top: 40px; border-top: 1px solid currentColor; padding-top: 20px; }
   h3 { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; opacity: .6; margin-bottom: 4px; }
@@ -770,7 +765,7 @@ ${a.hints
 </head>
 <body>
 <h1>${escapeHtml(chapter.title)}</h1>
-<p class="lead">${escapeHtml(chapter.month)} ・ 全${chapter.questionCount}問<br>${escapeHtml(chapter.description)}</p>
+<p class="lead">全${chapter.questionCount}問</p>
 ${items}
 </body>
 </html>

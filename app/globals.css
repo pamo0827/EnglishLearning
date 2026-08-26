@@ -1,20 +1,22 @@
 /* DESIGN.md のトークンを CSS カスタムプロパティへ 1:1 で写したもの。
    値を変えるときは DESIGN.md 側も必ず更新すること。 */
 :root {
-  --color-primary: #4f7cff;
+  color-scheme: light;
+
+  --color-primary: #2f5fe0;
   --color-on-primary: #ffffff;
-  --color-secondary: #1c2333;
-  --color-on-secondary: #c9d3e8;
-  --color-tertiary: #22d3a6;
-  --color-surface: #0d1017;
-  --color-surface-raised: #151a25;
-  --color-surface-sunken: #090b11;
-  --color-on-surface: #e8edf7;
-  --color-on-surface-muted: #8b97ad;
-  --color-outline: #242c3d;
-  --color-success: #22d3a6;
-  --color-warning: #f2c14e;
-  --color-danger: #ff6b6b;
+  --color-secondary: #eaeef7;
+  --color-on-secondary: #2c3444;
+  --color-tertiary: #0d7a5c;
+  --color-surface: #ffffff;
+  --color-surface-raised: #ffffff;
+  --color-surface-sunken: #f4f6fa;
+  --color-on-surface: #14171f;
+  --color-on-surface-muted: #5b6474;
+  --color-outline: #e0e5ef;
+  --color-success: #0d7a5c;
+  --color-warning: #8a5600;
+  --color-danger: #c02a26;
 
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Hiragino Sans",
     "Noto Sans JP", sans-serif;
@@ -66,6 +68,7 @@ main {
 .card {
   background: var(--color-surface-raised);
   border: 1px solid var(--color-outline);
+  /* 白地では地とカードが同色なので、階層は境界線だけで表す */
   border-radius: var(--rounded-lg);
   padding: var(--space-lg);
 }
@@ -92,7 +95,8 @@ button:disabled {
   opacity: 0.4;
 }
 button:not(:disabled):hover {
-  filter: brightness(1.12);
+  /* 白地では明るくしても変化が出ないため、暗くする方向へ倒す */
+  filter: brightness(0.94);
 }
 
 .btn-primary {
