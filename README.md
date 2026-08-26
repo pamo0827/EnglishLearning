@@ -100,6 +100,34 @@ ElevenLabs のキーは https://elevenlabs.io のアカウントメニュー →
 
 音声が揃っていない章は `ready: false` となり、画面上では「準備中」として選べない。
 
+## アクセス解析
+
+Cloudflare Web Analytics を使う。Cookie も localStorage も使わず個人データを保存しないため、
+同意バナーは不要。トークンが未設定なら計測スクリプトを一切読み込まない。
+
+**生の IP アドレスは記録されない。** 静的サイトにはサーバーが無く、アプリ自身が訪問者の IP を
+見ることはできない。Cloudflare 側も IP をそのまま保存せず、同一訪問者かどうかの判定に使うだけ。
+「IP 別の閲覧数」として実際に得られるのは、重複を除いたユニーク訪問者数になる。
+
+設定手順:
+
+1. Cloudflare ダッシュボード → Analytics & Logs → Web Analytics → **Add a site**
+   （DNS を Cloudflare に移す必要はない。JS ビーコン方式で使える）
+2. ホスト名に `<user>.github.io` を入れ、発行されたサイトトークンを控える
+3. リポジトリの Settings → Secrets and variables → Actions → **Variables** タブで
+   `CF_BEACON_TOKEN` にトークンを設定する
+4. 次のデプロイから計測が始まる
+
+```bash
+# コマンドで設定する場合
+gh variable set CF_BEACON_TOKEN --body "<トークン>"
+```
+
+ホスト名は `<user>.github.io` 単位になるため、同じアカウントで他の GitHub Pages サイトを
+公開していると合算される。ダッシュボードのパス絞り込みで `/EnglishLearning/` だけを見る。
+
+ローカルで試す場合は `.env` に `NEXT_PUBLIC_CF_BEACON_TOKEN` を入れる。
+
 ## オフラインと解説のダウンロード
 
 章の一覧に2つのボタンがある。

@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+/**
+ * Cloudflare Web Analytics のサイトトークン。
+ * 未設定なら計測スクリプトを一切読み込まない（開発中やフォーク時に勝手に計測しないため）。
+ * Cookie も localStorage も使わず個人データを保存しないため、同意バナーは不要。
+ */
+const CF_BEACON_TOKEN = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN ?? "";
+
 export const metadata: Metadata = {
   title: "English Listening Trainer",
-  description: "ネイティブの自然な英語を聞き取って入力し、AIに採点させるリスニング練習",
+  description: "ネイティブの自然な英語を聞き取って書き取り、聞き取れなかった原因を確かめるリスニング練習",
 };
 
 export default function RootLayout({
@@ -13,7 +20,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body>
+        {children}
+        {/*
+          next/script ではなく素の script タグを使う。next/script はタグを
+          クライアント側で生成するため、beacon が読む data-cf-beacon 属性が
+          静的 HTML に現れない。Cloudflare が配布する形をそのまま置く。
+        */}
+        {CF_BEACON_TOKEN !== "" && (
+          <script
+            defer
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon={JSON.stringify({ token: CF_BEACON_TOKEN })}
+          />
+        )}
+      </body>
     </html>
   );
 }

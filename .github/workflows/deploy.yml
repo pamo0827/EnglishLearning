@@ -41,6 +41,9 @@ jobs:
         env:
           # プロジェクトページは https://<user>.github.io/<repo>/ に置かれる
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+          # Cloudflare Web Analytics。リポジトリの Variables に CF_BEACON_TOKEN を
+          # 設定すると計測が有効になる（未設定なら何も読み込まない）
+          NEXT_PUBLIC_CF_BEACON_TOKEN: ${{ vars.CF_BEACON_TOKEN }}
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
