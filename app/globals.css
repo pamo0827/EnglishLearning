@@ -56,6 +56,14 @@ main {
   padding: var(--space-xl) var(--space-lg) var(--space-xxl);
 }
 
+/* DESIGN.md の typography.display */
+.app-title {
+  font-size: 30px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
 .label {
   font-size: 12px;
   font-weight: 600;
@@ -103,11 +111,15 @@ button:not(:disabled):hover {
   background: var(--color-primary);
   color: var(--color-on-primary);
   border-radius: var(--rounded-full);
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  padding: var(--space-md) var(--space-xl);
-  width: 100%;
+  /* 全幅をやめ、内容に合わせる。min-height はタップ領域を確保するため */
+  padding: 0 var(--space-lg);
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-secondary {
@@ -297,7 +309,10 @@ textarea:focus {
   .score {
     font-size: 44px;
   }
+  .app-title {
+    font-size: 26px;
+  }
   .btn-primary {
-    padding: var(--space-md) var(--space-lg);
+    padding: 0 var(--space-md);
   }
 }

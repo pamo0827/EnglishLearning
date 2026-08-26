@@ -161,7 +161,7 @@ export default function Page() {
     <main className="stack-xl">
       <header className="row-between">
         <div>
-          <div style={{ fontWeight: 600, fontSize: 17 }}>ディクテーション</div>
+          <div className="app-title">ディクテーション</div>
           {chapter && (
             <div className="muted" style={{ fontSize: 14 }}>
               {chapter.title}
