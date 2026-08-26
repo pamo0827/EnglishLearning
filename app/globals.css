@@ -160,29 +160,18 @@ button:not(:disabled):hover {
   box-shadow: inset 0 0 0 1px var(--color-success);
 }
 
-/* --- 再生ボタン：画面内で最大の要素 --- */
-.play {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 68px;
-  height: 68px;
-  border-radius: var(--rounded-full);
-  background: var(--color-primary);
-  color: var(--color-on-primary);
-  /* margin に 0 を含めると .stack-md の margin-top を打ち消してしまう。
-     上下は明示し、周囲の要素間より広く取る。 */
+/* --- 再生ボタン：横長。画面の主操作なので他のボタンより一回り大きい --- */
+.btn-play {
+  min-height: 48px;
+  font-size: 17px;
+  padding: 0 var(--space-xl);
+  /* margin に 0 を含めると .stack-md の margin-top を打ち消すため上下を明示する */
   margin: var(--space-lg) 0;
 }
-.play svg {
-  width: 26px;
-  height: 26px;
-  /* 三角形は重心が左に寄るため、光学的な中心に合わせて少しずらす */
-  margin-left: 3px;
-}
-.play.is-playing {
-  background: var(--color-secondary);
-  color: var(--color-on-secondary);
+.btn-play svg {
+  width: 15px;
+  height: 15px;
+  margin-right: 9px;
 }
 
 /* --- 入力欄 --- */
@@ -339,15 +328,6 @@ textarea:focus {
   }
   header .row button {
     flex: 1 0 auto;
-  }
-
-  .play {
-    width: 60px;
-    height: 60px;
-  }
-  .play svg {
-    width: 23px;
-    height: 23px;
   }
 
   /* iOS で入力時に拡大されないよう 16px を下回らせない */

@@ -447,10 +447,9 @@ function QuestionView({
         </div>
 
         <button
-          className={`play${playing ? " is-playing" : ""}`}
+          className="btn-primary btn-play"
           onClick={onPlay}
           disabled={!question}
-          aria-label={plays === 0 ? "再生" : "もう一回再生"}
         >
           {playing ? (
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -462,11 +461,8 @@ function QuestionView({
               <path d="M8 5.5v13a1 1 0 0 0 1.5.87l11-6.5a1 1 0 0 0 0-1.74l-11-6.5A1 1 0 0 0 8 5.5Z" />
             </svg>
           )}
+          {playing ? "再生中" : plays === 0 ? "再生する" : "もう一回再生する"}
         </button>
-
-        <div className="muted" style={{ fontSize: 14 }}>
-          {plays === 0 ? "再生ボタンを押してください" : "もう一回"}
-        </div>
 
         <div className="label">再生回数 {plays}</div>
 
