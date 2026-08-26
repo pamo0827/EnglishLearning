@@ -364,10 +364,10 @@ function ChapterCard({
 
       {chapter.ready ? (
         <>
-          <button className="btn-primary" onClick={() => onStart(chapter.id)}>
-            この章を始める
-          </button>
-          <div className="row" style={{ flexWrap: "wrap", gap: 8 }}>
+          <div className="actions">
+            <button className="btn-primary" onClick={() => onStart(chapter.id)}>
+              この章を始める
+            </button>
             <button
               className="btn-secondary"
               onClick={saved ? remove : download}
@@ -694,12 +694,14 @@ function ChapterDone({
         </div>
       </section>
 
-      <button className="btn-primary" onClick={onRestart}>
-        もう一度この章をやる
-      </button>
-      <button className="btn-secondary" onClick={onBack}>
-        章を選び直す
-      </button>
+      <div className="actions">
+        <button className="btn-primary" onClick={onRestart}>
+          もう一度この章をやる
+        </button>
+        <button className="btn-secondary" onClick={onBack}>
+          章を選び直す
+        </button>
+      </div>
     </div>
   );
 }

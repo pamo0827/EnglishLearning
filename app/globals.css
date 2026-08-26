@@ -128,7 +128,12 @@ button:not(:disabled):hover {
   border-radius: var(--rounded-full);
   font-size: 15px;
   font-weight: 500;
-  padding: 10px var(--space-lg);
+  /* btn-primary と寸法を完全に揃える。並べたときに高さがずれると目に付く */
+  padding: 0 var(--space-lg);
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* --- 再生ボタン：画面内で最大の要素 --- */
@@ -218,6 +223,25 @@ textarea:focus {
 
 .muted {
   color: var(--color-on-surface-muted);
+}
+
+/* ボタンの並び。左端を揃え、折り返しても行間が空きすぎないようにする */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.actions button {
+  flex: 0 1 auto;
+}
+
+/* 狭い画面では縦に積み、幅を揃えて端を合わせる */
+@media (max-width: 480px) {
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 .row {
