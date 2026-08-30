@@ -48,6 +48,13 @@ export const CHAPTERS: Chapter[] = [
     description:
       "はっきり言い切らない会話。前置き、ぼかし、言い直しが多く、音の省略も強くなる。",
   },
+  {
+    id: 3,
+    title: "第3章",
+    month: "2026-10",
+    description:
+      "数字・否定・紛らわしい音の対。連結とは別種の聞き取り失敗を集めた章。",
+  },
 ];
 
 export const QUESTIONS: Question[] = [
@@ -821,6 +828,351 @@ export const QUESTIONS: Question[] = [
       {
         phrase: "Honestly",
         note: "先頭の h は発音しません。「アネストリ」と聞こえます。",
+      },
+    ],
+  },
+  // ---------------- 第3章 ----------------
+  {
+    id: 25,
+    chapter: 3,
+    level: "A2",
+    difficulty: 2,
+    transcript: "It's on the thirteenth, not the thirtieth.",
+    translation: "13日だよ、30日じゃなくて。",
+    tags: ["numbers", "minimal_pair", "conversation"],
+    speed: 0.95,
+    voice: "shimmer",
+    hints: [
+      {
+        phrase: "thirteenth",
+        note: "-teen は後ろを強く読み「サーティーンス」。語尾がはっきり伸びます。",
+      },
+      {
+        phrase: "thirtieth",
+        note: "-ty は前を強く読み「サーティエス」。thirteenth との違いは強勢の位置で、母音の長さではありません。数字は強勢で聞き分けます。",
+      },
+      {
+        phrase: "It's on the",
+        note: "It's on the が連結して「イツォンダ」と一息になり、直後の数字だけが強く残ります。",
+      },
+    ],
+  },
+  {
+    id: 26,
+    chapter: 3,
+    level: "B1",
+    difficulty: 3,
+    transcript: "I can't make it before six, but I can do seven.",
+    translation: "6時前は無理だけど、7時なら大丈夫。",
+    tags: ["negation", "minimal_pair", "conversation"],
+    speed: 1.0,
+    voice: "ash",
+    hints: [
+      {
+        phrase: "can't",
+        note: "米語の can't は t が脱落することが多く、can と区別がつきにくくなります。決め手は母音で、can't は「キャン」と強くはっきり、can は弱形 /kən/ で「クン」に近く潰れます。",
+      },
+      {
+        phrase: "I can do",
+        note: "肯定の can は弱く速く流れ、後ろの動詞（do）のほうが強く聞こえます。can が強く聞こえたら否定を疑うこと。",
+      },
+      {
+        phrase: "make it before",
+        note: "make it が連結して「メイキッ」、before の f が弱くなります。make it で「間に合う・都合をつける」。",
+      },
+      {
+        phrase: "before six",
+        note: "six と seven は語頭の子音だけが違い、弱く読まれると差が小さくなります。数字は文脈（時刻の前後関係）とセットで捉えること。",
+      },
+      {
+        phrase: "do seven",
+        note: "do seven が連結して「ドゥセヴン」。can do ~ で「〜なら都合がつく」。six との対比なので、数字だけでなく前後の動詞まで拾うこと。",
+      },
+    ],
+  },
+  {
+    id: 27,
+    chapter: 3,
+    level: "B1",
+    difficulty: 3,
+    transcript: "We sold about fifty last week, maybe fifteen on Friday alone.",
+    translation: "先週50個くらい売れて、金曜だけで15個かな。",
+    tags: ["numbers", "minimal_pair", "past_tense"],
+    speed: 1.0,
+    voice: "coral",
+    hints: [
+      {
+        phrase: "fifty",
+        note: "FIF-ty と前を強く読み、語尾の t はフラップ化して「フィフディ」に近くなります。",
+      },
+      {
+        phrase: "fifteen",
+        note: "fif-TEEN と後ろを強く読みます。文中では次の語との関係で強勢が前に移ることもあるため、迷ったら語尾の n が聞こえるかで判断します。",
+      },
+      {
+        phrase: "on Friday alone",
+        note: "Friday alone が連結して「フライデアロウン」。ここでの alone は「〜だけで」という強調です。",
+      },
+      {
+        phrase: "We sold about",
+        note: "sold の d が次の about に飲まれ「ソウラバウト」と連結します。about は「およそ」で、直後の数字が概数だと知らせる合図です。",
+      },
+      {
+        phrase: "last week, maybe",
+        note: "last week の t が脱落して「ラスウィーク」。maybe は前の文とつながらず、少し間を置いて次の数字を導きます。",
+      },
+      {
+        phrase: "week",
+        note: "week の語末 k はほとんど破裂せず、次の maybe との境目が曖昧になります。",
+      },
+    ],
+  },
+  {
+    id: 28,
+    chapter: 3,
+    level: "A2",
+    difficulty: 2,
+    transcript: "Is that Tuesday or Thursday? I always mix them up.",
+    translation: "それ火曜？　木曜？　いつも混同しちゃうんだよね。",
+    tags: ["minimal_pair", "question", "phrasal_verb"],
+    speed: 0.95,
+    voice: "sage",
+    hints: [
+      {
+        phrase: "Tuesday",
+        note: "米語では「トゥーズデイ」、英語では「チューズデイ」に近くなります。頭の子音が Thursday の th とはっきり違います。",
+      },
+      {
+        phrase: "Thursday",
+        note: "th は舌先を歯に当てる無声音で「サーズデイ」。Tuesday の t とは口の形が別物です。曜日は頭の子音で聞き分けます。",
+      },
+      {
+        phrase: "mix them up",
+        note: "mix them up が連結し、them の th が弱まって「ミクセマップ」になります。mix up で「混同する」。",
+      },
+      {
+        phrase: "I always",
+        note: "I always が連結して「アイオールウェイズ」。always の l は暗い l で、ほとんど母音のように聞こえます。",
+      },
+    ],
+  },
+  {
+    id: 29,
+    chapter: 3,
+    level: "B2",
+    difficulty: 3,
+    transcript: "It comes to eighteen eighty, so here's a twenty.",
+    translation: "18ドル80セントだから、20ドル出すね。",
+    tags: ["numbers", "money", "conversation"],
+    speed: 1.0,
+    voice: "echo",
+    hints: [
+      {
+        phrase: "It comes to",
+        note: "comes to が連結して「カムズトゥ」。come to で「合計〜になる」。金額を言う前の決まった前置きです。",
+      },
+      {
+        phrase: "eighteen eighty",
+        note: "$18.80 を「エイティーンエイティ」と続けて読みます。dollars も cents も言いません。金額は数字を2つ並べるだけ、という言い方に慣れること。",
+      },
+      {
+        phrase: "here's a twenty",
+        note: "a twenty で「20ドル札」。紙幣は a five / a ten / a twenty のように冠詞を付けて呼びます。",
+      },
+    ],
+  },
+  {
+    id: 30,
+    chapter: 3,
+    level: "B2",
+    difficulty: 4,
+    transcript: "I won't be there, but I want you to go ahead without me.",
+    translation: "私は行けないけど、先に進めちゃって。",
+    tags: ["negation", "minimal_pair", "conversation"],
+    speed: 1.05,
+    voice: "verse",
+    hints: [
+      {
+        phrase: "won't",
+        note: "won't は /woʊnt/ で「ウォウント」。want /wɑnt/ とは母音が違い、二重母音になります。会話で最も紛らわしい対の一つです。",
+      },
+      {
+        phrase: "I want you to",
+        note: "want you が同化して「ワンチュ」、to は弱形。want の t は次の y と混ざります。",
+      },
+      {
+        phrase: "go ahead without me",
+        note: "go ahead が連結して「ゴウアヘッ」。go ahead で「先に進める」。without me の th が弱く潰れます。",
+      },
+    ],
+  },
+  {
+    id: 31,
+    chapter: 3,
+    level: "B2",
+    difficulty: 4,
+    transcript: "It was supposed to be a quarter to nine, not a quarter after.",
+    translation: "8時45分のはずだったんだよ、9時15分じゃなくて。",
+    tags: ["time", "numbers", "conversation"],
+    speed: 1.05,
+    voice: "ballad",
+    hints: [
+      {
+        phrase: "a quarter to nine",
+        note: "quarter to ~ で「〜時15分前」。a quarter to nine は8時45分で、9時ではありません。to が「前」を表します。",
+      },
+      {
+        phrase: "a quarter after",
+        note: "quarter after ~ は「〜時15分過ぎ」。to と after の一語で1時間半ずれます。時刻は前置詞まで聞き取ること。",
+      },
+      {
+        phrase: "was supposed to be",
+        note: "supposed to が「サポーストゥ」と潰れ、be と合わせて一息で流れます。",
+      },
+    ],
+  },
+  {
+    id: 32,
+    chapter: 3,
+    level: "B1",
+    difficulty: 3,
+    transcript: "Can you leave it at the front desk? I'll grab it later.",
+    translation: "受付に置いといてくれる？　後で取りに行くから。",
+    tags: ["request", "connected_speech", "conversation"],
+    speed: 1.0,
+    voice: "shimmer",
+    hints: [
+      {
+        phrase: "Can you",
+        note: "依頼の Can you は「キャニュ」と一塊になり、can はほとんど聞こえません。文頭の弱い can は依頼の合図です。",
+      },
+      {
+        phrase: "leave it at the",
+        note: "leave it at the が全部連結して「リーヴィラッダ」。t が2回フラップ化します。",
+      },
+      {
+        phrase: "grab it later",
+        note: "grab it が連結して「グラビッ」。grab で「取りに行く・受け取る」という口語的な意味になります。",
+      },
+      {
+        phrase: "the front desk",
+        note: "front desk の t が次の d に飲まれ「フロンデスク」になります。受付を指す決まった言い方です。",
+      },
+      {
+        phrase: "I'll grab",
+        note: "I'll が「アル」程度に縮み、grab と続けて一息になります。",
+      },
+    ],
+  },
+  {
+    id: 33,
+    chapter: 3,
+    level: "B2",
+    difficulty: 4,
+    transcript: "There were about a hundred and forty people, give or take.",
+    translation: "140人くらいだったかな、だいたいだけど。",
+    tags: ["numbers", "idiom", "past_tense"],
+    speed: 1.05,
+    voice: "sage",
+    hints: [
+      {
+        phrase: "There were about",
+        note: "There were が「ダワ」程度に潰れ、about と続けて一息になります。were は弱形 /wər/ です。",
+      },
+      {
+        phrase: "a hundred and forty",
+        note: "百の位と十の位を and でつなぎます。and は「ン」に潰れ「ハンドレドゥンフォーティ」と聞こえます。数字が長いときは and の位置で桁を切ること。",
+      },
+      {
+        phrase: "give or take",
+        note: "give or take が連結して「ギヴォアテイク」。「多少の増減はあるが」という決まった言い方で、数字の後ろに置きます。",
+      },
+      {
+        phrase: "forty people",
+        note: "people の p は破裂が弱く、直前の forty と続けて「フォーティピーポー」と流れます。",
+      },
+    ],
+  },
+  {
+    id: 34,
+    chapter: 3,
+    level: "C1",
+    difficulty: 5,
+    transcript: "She's been there twice already this month, hasn't she?",
+    translation: "彼女、今月もう2回行ってるよね？",
+    tags: ["present_perfect", "tag_question", "fast_speech"],
+    speed: 1.12,
+    voice: "coral",
+    hints: [
+      {
+        phrase: "She's been",
+        note: "She has been の短縮。「シズビン」と一瞬で終わり、has は音として残りません。",
+      },
+      {
+        phrase: "twice already",
+        note: "twice already が連結し、already の l が暗い l になって「トワイサルレディ」と流れます。",
+      },
+      {
+        phrase: "hasn't she",
+        note: "付加疑問。hasn't の t が脱落し、she と合わせて「ハズンシ」と一息で終わります。文末が上がるか下がるかで、確認か問いかけかが変わります。",
+      },
+      {
+        phrase: "already this month",
+        note: "this month の th が2回続き、口の中で潰れて「ディスマンス」になります。期間を示す語は文末で弱くなりやすい箇所です。",
+      },
+    ],
+  },
+  {
+    id: 35,
+    chapter: 3,
+    level: "C1",
+    difficulty: 5,
+    transcript: "I'd have said something, but I wasn't sure it was worth it.",
+    translation: "何か言えばよかったんだけど、言う価値があるか分からなくてさ。",
+    tags: ["counterfactual", "reduction", "fast_speech"],
+    speed: 1.1,
+    voice: "ash",
+    hints: [
+      {
+        phrase: "I'd have said",
+        note: "I would have の短縮で「アイダヴ」、さらに崩れて「アイダ」になります。仮定法の would have は音がほとんど残りません。",
+      },
+      {
+        phrase: "wasn't sure",
+        note: "wasn't の t が次の s に飲まれ「ワズンシュア」になります。否定が消えて聞こえやすい箇所です。",
+      },
+      {
+        phrase: "worth it",
+        note: "worth it が連結して「ワーシッ」。be worth it で「その価値がある」。",
+      },
+      {
+        phrase: "said something",
+        note: "said something の d が s に飲まれ「セッサムシン」になります。something の -thing は「シン」程度にしか聞こえません。",
+      },
+    ],
+  },
+  {
+    id: 36,
+    chapter: 3,
+    level: "C1",
+    difficulty: 5,
+    transcript: "He couldn't have known that, could he? Nobody told him.",
+    translation: "彼が知ってたはずないよね？　誰も言ってないんだから。",
+    tags: ["counterfactual", "tag_question", "negation", "fast_speech"],
+    speed: 1.12,
+    voice: "echo",
+    hints: [
+      {
+        phrase: "couldn't have known",
+        note: "couldn't have が「クドゥナヴ」から「クドゥナ」まで潰れます。「〜したはずがない」という過去の否定推量で、could have（〜できたはず）とは意味が正反対です。",
+      },
+      {
+        phrase: "could he",
+        note: "付加疑問。否定文には肯定の付加疑問が付きます。「クディ」と一瞬で終わります。",
+      },
+      {
+        phrase: "Nobody told him",
+        note: "told him の h が脱落して「トウルディム」。主語が Nobody なので、文全体がすでに否定です。",
       },
     ],
   },

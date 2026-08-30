@@ -1,6 +1,6 @@
 # 採点エンジン検査レポート
 
-自動生成: `npm run grade:test`。問題 24 件 / 検査 513 件 / 失敗 0 件。
+自動生成: `npm run grade:test`。問題 36 件 / 検査 726 件 / 失敗 0 件。
 
 各問題について、同義入力・語の脱落・音の似た語への誤認識・余分な語の挿入を
 機械的に作って採点させた結果。「解説なし」の列は、その語を落としたときに
@@ -196,4 +196,100 @@
 
 - 検査 26 件 / 失敗 0 件
 - 1語脱落時のスコア: 88〜96
+- 解説なし: なし
+
+## Q25（第3章 Lv2）
+
+> It's on the thirteenth, not the thirtieth.
+
+- 検査 14 件 / 失敗 0 件
+- 1語脱落時のスコア: 79〜90
+- 解説なし: なし
+
+## Q26（第3章 Lv3）
+
+> I can't make it before six, but I can do seven.
+
+- 検査 17 件 / 失敗 0 件
+- 1語脱落時のスコア: 87〜93
+- 解説なし: なし
+
+## Q27（第3章 Lv3）
+
+> We sold about fifty last week, maybe fifteen on Friday alone.
+
+- 検査 19 件 / 失敗 0 件
+- 1語脱落時のスコア: 90〜94
+- 解説なし: なし
+
+## Q28（第3章 Lv2）
+
+> Is that Tuesday or Thursday? I always mix them up.
+
+- 検査 16 件 / 失敗 0 件
+- 1語脱落時のスコア: 86〜92
+- 解説なし: なし
+
+## Q29（第3章 Lv3）
+
+> It comes to eighteen eighty, so here's a twenty.
+
+- 検査 17 件 / 失敗 0 件
+- 1語脱落時のスコア: 85〜92
+- 解説なし: なし
+
+## Q30（第3章 Lv4）
+
+> I won't be there, but I want you to go ahead without me.
+
+- 検査 21 件 / 失敗 0 件
+- 1語脱落時のスコア: 88〜94
+- 解説なし: なし
+
+## Q31（第3章 Lv4）
+
+> It was supposed to be a quarter to nine, not a quarter after.
+
+- 検査 21 件 / 失敗 0 件
+- 1語脱落時のスコア: 89〜94
+- 解説なし: なし
+
+## Q32（第3章 Lv3）
+
+> Can you leave it at the front desk? I'll grab it later.
+
+- 検査 19 件 / 失敗 0 件
+- 1語脱落時のスコア: 88〜94
+- 解説なし: なし
+
+## Q33（第3章 Lv4）
+
+> There were about a hundred and forty people, give or take.
+
+- 検査 17 件 / 失敗 0 件
+- 1語脱落時のスコア: 88〜94
+- 解説なし: なし
+
+## Q34（第3章 Lv5）
+
+> She's been there twice already this month, hasn't she?
+
+- 検査 16 件 / 失敗 0 件
+- 1語脱落時のスコア: 86〜93
+- 解説なし: なし
+
+## Q35（第3章 Lv5）
+
+> I'd have said something, but I wasn't sure it was worth it.
+
+- 検査 19 件 / 失敗 0 件
+- 1語脱落時のスコア: 88〜94
+- 解説なし: なし
+
+## Q36（第3章 Lv5）
+
+> He couldn't have known that, could he? Nobody told him.
+
+- 検査 17 件 / 失敗 0 件
+- 1語脱落時のスコア: 85〜93
 - 解説なし: なし
