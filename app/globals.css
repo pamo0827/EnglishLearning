@@ -165,7 +165,11 @@ button:not(:disabled):hover {
   min-height: 48px;
   font-size: 17px;
   padding: 0 var(--space-xl);
-  /* margin に 0 を含めると .stack-md の margin-top を打ち消すため上下を明示する */
+}
+
+/* 再生ボタンを包む行。余白はここが持つ。
+   ボタン自身に margin を置くと、包んだ div の余白と二重にかかる。 */
+.play-row {
   margin: var(--space-lg) 0;
 }
 .btn-play svg {
