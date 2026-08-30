@@ -162,29 +162,45 @@ function SetList({
     <div className="stack-xl">
       {data.chapters.map((c) => (
         <div key={c.id} className="stack-md">
+          {/* 章の見出し。ディクテーションの章カードと同じ形にそろえる */}
           <div>
             <div style={{ fontWeight: 600, fontSize: 17 }}>{c.title}</div>
             <div className="label" style={{ marginTop: 4 }}>
-              {c.setCount}セット {c.questionCount}問
+              全{c.setCount}セット {c.questionCount}問
             </div>
           </div>
 
           {data.sets
             .filter((s) => s.chapter === c.id)
             .map((s) => (
-              <section key={s.id} className="card stack-sm">
-                <div className="label">
-                  {FORMAT_LABEL[s.format]} ・ {s.docType} ・ {s.wordCount}語
+              <section key={s.id} className="card stack-md">
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 17 }}>{s.title}</div>
+                  <div className="label" style={{ marginTop: 4 }}>
+                    {FORMAT_LABEL[s.format]} ・ {s.docType} ・ {s.wordCount}語 ・{" "}
+                    {s.questions.length}問
+                  </div>
                 </div>
-                <div style={{ fontWeight: 600 }}>{s.title}</div>
-                <div className="label">
-                  {s.questions.length}問 ・ 目標 {s.targetSecPerQuestion}秒/問（
-                  {formatDuration(s.questions.length * s.targetSecPerQuestion)}）
-                </div>
+
                 <div className="actions">
                   <button className="btn-primary" onClick={() => onStart(s)}>
                     始める
                   </button>
+                </div>
+
+                <div className="stack-sm">
+                  <div className="label">目標</div>
+                  <div className="row" style={{ gap: 16, flexWrap: "wrap" }}>
+                    <span className="chip">
+                      {s.targetSecPerQuestion}秒 / 問
+                    </span>
+                    <span className="chip">
+                      全体{" "}
+                      {formatDuration(
+                        s.questions.length * s.targetSecPerQuestion
+                      )}
+                    </span>
+                  </div>
                 </div>
               </section>
             ))}
@@ -248,8 +264,11 @@ function SolveView({
   return (
     <div className="stack-xl">
       <div className="row-between">
-        <div className="label">
-          {FORMAT_LABEL[set.format]} ・ {set.docType} ・ {set.wordCount}語
+        <div className="row" style={{ alignItems: "baseline", gap: 8 }}>
+          <span className="question-no">{set.title}</span>
+          <span className="label">
+            {FORMAT_LABEL[set.format]} ・ {set.wordCount}語
+          </span>
         </div>
         <div className="row" style={{ gap: 12 }}>
           <span className="timer">{formatDuration(elapsedSec)}</span>
@@ -332,7 +351,10 @@ function ReadingResultView({
   return (
     <div className="stack-xl">
       <section className="card stack-md">
-        <div className="label">{set.title} の結果</div>
+        <div className="row" style={{ alignItems: "baseline", gap: 8 }}>
+          <span className="question-no">{set.title}</span>
+          <span className="label">の結果</span>
+        </div>
 
         <div className="row" style={{ gap: 32, flexWrap: "wrap" }}>
           <div>

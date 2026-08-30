@@ -340,7 +340,6 @@ function ChapterCard({
         .sort((a, b) => a - b),
     [index, chapter.id]
   );
-  const done = ids.filter((id) => progress[id] !== undefined).length;
   // 未解答の最初の問題から再開する。全問済みなら先頭に戻る。
   const firstUnanswered = ids.findIndex((id) => progress[id] === undefined);
   const resumeAt = firstUnanswered === -1 ? 0 : firstUnanswered;
@@ -446,12 +445,9 @@ function ChapterCard({
             </button>
           </div>
 
-          {/* どの問題からでも入れるようにする。閉じても続きから戻れる。 */}
-          <div className="stack-sm">
-            <div className="label">
-              問題 ・ {done} / {ids.length} 問 解答済み
-            </div>
-            <div className="q-grid">
+          {/* どの問題からでも入れるようにする。閉じても続きから戻れる。
+              升目が番号と点数を示すので、見出しは置かない。 */}
+          <div className="q-grid">
               {ids.map((qid, i) => {
                 const score = progress[qid];
                 const state =
@@ -480,7 +476,6 @@ function ChapterCard({
                   </button>
                 );
               })}
-            </div>
           </div>
 
           <div className="stack-sm">
