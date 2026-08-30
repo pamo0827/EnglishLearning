@@ -218,6 +218,11 @@ export default function Page() {
           position={position}
           total={order.length}
           onNext={next}
+          playing={playing}
+          plays={plays}
+          rate={rate}
+          onRate={setRate}
+          onPlay={play}
         />
       )}
 
@@ -403,6 +408,61 @@ function ChapterCard({
 }
 
 /* ------------------------------------------------------------------ *
+ * 再生の操作。出題画面と結果画面で共有する
+ * ------------------------------------------------------------------ */
+
+function PlayControls({
+  playing,
+  plays,
+  rate,
+  onRate,
+  onPlay,
+  disabled,
+  showCount,
+}: {
+  playing: boolean;
+  plays: number;
+  rate: number;
+  onRate: (v: number) => void;
+  onPlay: () => void;
+  disabled?: boolean;
+  showCount?: boolean;
+}) {
+  return (
+    <>
+      <button className="btn-primary btn-play" onClick={onPlay} disabled={disabled}>
+        {playing ? (
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <rect x="6" y="5" width="4" height="14" rx="1" />
+            <rect x="14" y="5" width="4" height="14" rx="1" />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M8 5.5v13a1 1 0 0 0 1.5.87l11-6.5a1 1 0 0 0 0-1.74l-11-6.5A1 1 0 0 0 8 5.5Z" />
+          </svg>
+        )}
+        {playing ? "再生中" : plays === 0 ? "再生する" : "もう一回再生する"}
+      </button>
+
+      {showCount && <div className="label">再生回数 {plays}</div>}
+
+      <div className="speed" role="group" aria-label="再生速度">
+        {RATES.map((r) => (
+          <button
+            key={r.value}
+            className={`speed-btn${r.value === rate ? " is-active" : ""}`}
+            onClick={() => onRate(r.value)}
+            aria-pressed={r.value === rate}
+          >
+            {r.label}
+          </button>
+        ))}
+      </div>
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ *
  * 出題画面：問題番号・再生ボタン・再生回数・再生速度・入力欄・採点ボタンのみ
  * ------------------------------------------------------------------ */
 
@@ -446,38 +506,15 @@ function QuestionView({
           </span>
         </div>
 
-        <button
-          className="btn-primary btn-play"
-          onClick={onPlay}
+        <PlayControls
+          playing={playing}
+          plays={plays}
+          rate={rate}
+          onRate={onRate}
+          onPlay={onPlay}
           disabled={!question}
-        >
-          {playing ? (
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <rect x="6" y="5" width="4" height="14" rx="1" />
-              <rect x="14" y="5" width="4" height="14" rx="1" />
-            </svg>
-          ) : (
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M8 5.5v13a1 1 0 0 0 1.5.87l11-6.5a1 1 0 0 0 0-1.74l-11-6.5A1 1 0 0 0 8 5.5Z" />
-            </svg>
-          )}
-          {playing ? "再生中" : plays === 0 ? "再生する" : "もう一回再生する"}
-        </button>
-
-        <div className="label">再生回数 {plays}</div>
-
-        <div className="speed" role="group" aria-label="再生速度">
-          {RATES.map((r) => (
-            <button
-              key={r.value}
-              className={`speed-btn${r.value === rate ? " is-active" : ""}`}
-              onClick={() => onRate(r.value)}
-              aria-pressed={r.value === rate}
-            >
-              {r.label}
-            </button>
-          ))}
-        </div>
+          showCount
+        />
       </section>
 
       <section className="stack-md">
@@ -515,12 +552,22 @@ function ResultView({
   position,
   total,
   onNext,
+  playing,
+  plays,
+  rate,
+  onRate,
+  onPlay,
 }: {
   result: GradeResult;
   answer: string;
   position: number;
   total: number;
   onNext: () => void;
+  playing: boolean;
+  plays: number;
+  rate: number;
+  onRate: (v: number) => void;
+  onPlay: () => void;
 }) {
   const scoreColor =
     result.score >= 85
@@ -565,6 +612,16 @@ function ResultView({
           日本語訳
         </div>
         <p style={{ margin: 0 }}>{result.translation}</p>
+
+        {/* 正解を読みながら聞き直せるようにする。速度を落として
+            聞き取れなかった箇所を確かめるのがこの画面の主目的。 */}
+        <PlayControls
+          playing={playing}
+          plays={plays}
+          rate={rate}
+          onRate={onRate}
+          onPlay={onPlay}
+        />
       </section>
 
       <section className="card stack-md">
