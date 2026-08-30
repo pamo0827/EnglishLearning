@@ -4,6 +4,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { grade, type GradeResult } from "@/lib/grade";
 import { unseal, type Sealed } from "@/lib/crypto";
 import { Reading } from "./Reading";
+import {
+  loadProgress,
+  saveProgress,
+  clearChapterProgress,
+  type Progress,
+} from "@/lib/progress";
 
 /** GitHub Pages のプロジェクトページ配下で動かすための接頭辞 */
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
@@ -66,11 +72,15 @@ export default function Page() {
   const [rate, setRate] = useState(1);
   const [answer, setAnswer] = useState("");
   const [result, setResult] = useState<GradeResult | null>(null);
-  const [scores, setScores] = useState<Record<number, number>>({});
+  const [progress, setProgress] = useState<Progress>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    setProgress(loadProgress());
+  }, []);
 
   useEffect(() => {
     fetch(asset("data/index.json"))
@@ -104,14 +114,15 @@ export default function Page() {
   const current = index?.questions.find((q) => q.id === currentId);
   const chapter = index?.chapters.find((c) => c.id === chapterId);
 
-  const startChapter = (id: number) => {
+  /** 章を開始する。at を渡すとその問題から再開する */
+  const startChapter = (id: number, at = 0) => {
     setChapterId(id);
-    setPosition(0);
+    setPosition(at);
     setPlays(0);
     setAnswer("");
     setResult(null);
-    setScores({});
     setError(null);
+    window.scrollTo(0, 0);
   };
 
   const play = () => {
@@ -138,7 +149,12 @@ export default function Page() {
       const a = await fetchAnswer(currentId);
       const r = grade(a, answer);
       setResult(r);
-      setScores((s) => ({ ...s, [currentId]: r.score }));
+      // 進捗は端末に残す。閉じても続きから再開できるようにするため。
+      setProgress((prev) => {
+        const next = { ...prev, [currentId]: r.score };
+        saveProgress(next);
+        return next;
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : "採点に失敗しました");
     } finally {
@@ -215,12 +231,20 @@ export default function Page() {
       {index === null ? (
         <p className="muted">読み込み中…</p>
       ) : chapterId === null ? (
-        <ChapterList index={index} onStart={startChapter} />
+        <ChapterList index={index} progress={progress} onStart={startChapter} />
       ) : finished ? (
         <ChapterDone
           chapter={chapter}
-          scores={scores}
-          onRestart={() => startChapter(chapterId)}
+          ids={order}
+          progress={progress}
+          onRestart={() => {
+            setProgress((prev) => {
+              const next = clearChapterProgress(prev, order);
+              saveProgress(next);
+              return next;
+            });
+            startChapter(chapterId);
+          }}
           onBack={backToChapters}
         />
       ) : result === null ? (
@@ -266,15 +290,23 @@ export default function Page() {
 
 function ChapterList({
   index,
+  progress,
   onStart,
 }: {
   index: Index;
-  onStart: (id: number) => void;
+  progress: Progress;
+  onStart: (id: number, at?: number) => void;
 }) {
   return (
     <div className="stack-md">
       {index.chapters.map((c) => (
-        <ChapterCard key={c.id} chapter={c} index={index} onStart={onStart} />
+        <ChapterCard
+          key={c.id}
+          chapter={c}
+          index={index}
+          progress={progress}
+          onStart={onStart}
+        />
       ))}
     </div>
   );
@@ -283,19 +315,35 @@ function ChapterList({
 function ChapterCard({
   chapter,
   index,
+  progress,
   onStart,
 }: {
   chapter: ChapterMeta;
   index: Index;
-  onStart: (id: number) => void;
+  progress: Progress;
+  onStart: (id: number, at?: number) => void;
 }) {
   const [saved, setSaved] = useState<boolean | null>(null);
-  const [progress, setProgress] = useState<{ done: number; total: number } | null>(
-    null
-  );
+  const [downloading, setDownloading] = useState<{
+    done: number;
+    total: number;
+  } | null>(null);
   const [note, setNote] = useState<string | null>(null);
 
   const urls = useMemo(() => chapterUrls(index, chapter.id), [index, chapter.id]);
+
+  const ids = useMemo(
+    () =>
+      index.questions
+        .filter((q) => q.chapter === chapter.id)
+        .map((q) => q.id)
+        .sort((a, b) => a - b),
+    [index, chapter.id]
+  );
+  const done = ids.filter((id) => progress[id] !== undefined).length;
+  // 未解答の最初の問題から再開する。全問済みなら先頭に戻る。
+  const firstUnanswered = ids.findIndex((id) => progress[id] === undefined);
+  const resumeAt = firstUnanswered === -1 ? 0 : firstUnanswered;
 
   // 端末に保存済みかどうかを調べる
   useEffect(() => {
@@ -321,18 +369,18 @@ function ChapterCard({
       return;
     }
     setNote(null);
-    setProgress({ done: 0, total: urls.length });
+    setDownloading({ done: 0, total: urls.length });
     try {
       const cache = await caches.open(chapterCacheName(chapter.id));
       for (let i = 0; i < urls.length; i++) {
         await cache.add(urls[i]);
-        setProgress({ done: i + 1, total: urls.length });
+        setDownloading({ done: i + 1, total: urls.length });
       }
       setSaved(true);
     } catch {
       setNote("保存に失敗しました。通信状況を確認してください。");
     } finally {
-      setProgress(null);
+      setDownloading(null);
     }
   };
 
@@ -344,13 +392,8 @@ function ChapterCard({
   /** 解説をひとつの HTML にまとめて書き出す。正解を含むので明示的な操作でのみ実行する */
   const downloadNotes = async () => {
     setNote(null);
-    setProgress({ done: 0, total: chapter.questionCount });
+    setDownloading({ done: 0, total: chapter.questionCount });
     try {
-      const ids = index.questions
-        .filter((q) => q.chapter === chapter.id)
-        .map((q) => q.id)
-        .sort((a, b) => a - b);
-
       const answers: (Answer & { id: number; level: string; difficulty: number })[] =
         [];
       for (let i = 0; i < ids.length; i++) {
@@ -361,7 +404,7 @@ function ChapterCard({
           level: meta.level,
           difficulty: meta.difficulty,
         });
-        setProgress({ done: i + 1, total: ids.length });
+        setDownloading({ done: i + 1, total: ids.length });
       }
 
       const html = buildNotesHtml(chapter, answers);
@@ -376,7 +419,7 @@ function ChapterCard({
     } catch {
       setNote("解説の書き出しに失敗しました。");
     } finally {
-      setProgress(null);
+      setDownloading(null);
     }
   };
 
@@ -392,12 +435,52 @@ function ChapterCard({
       {chapter.ready ? (
         <>
           <div className="actions">
-            <button className="btn-primary" onClick={() => onStart(chapter.id)}>
+            <button
+              className="btn-primary"
+              onClick={() => onStart(chapter.id, resumeAt)}
+            >
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M8 5.5v13a1 1 0 0 0 1.5.87l11-6.5a1 1 0 0 0 0-1.74l-11-6.5A1 1 0 0 0 8 5.5Z" />
               </svg>
-              始める
+              {resumeAt > 0 ? `第${resumeAt + 1}問から続ける` : "始める"}
             </button>
+          </div>
+
+          {/* どの問題からでも入れるようにする。閉じても続きから戻れる。 */}
+          <div className="stack-sm">
+            <div className="label">
+              問題 ・ {done} / {ids.length} 問 解答済み
+            </div>
+            <div className="q-grid">
+              {ids.map((qid, i) => {
+                const score = progress[qid];
+                const state =
+                  score === undefined
+                    ? ""
+                    : score >= 85
+                      ? " is-good"
+                      : score >= 55
+                        ? " is-mid"
+                        : " is-low";
+                return (
+                  <button
+                    key={qid}
+                    className={`q-cell${state}`}
+                    onClick={() => onStart(chapter.id, i)}
+                    title={
+                      score === undefined
+                        ? `第${i + 1}問（未解答）`
+                        : `第${i + 1}問（${score}点）`
+                    }
+                  >
+                    <span className="q-cell-no">{i + 1}</span>
+                    <span className="q-cell-score">
+                      {score === undefined ? "—" : score}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="stack-sm">
@@ -406,11 +489,11 @@ function ChapterCard({
               <button
                 className={`btn-secondary${saved ? " is-done" : ""}`}
                 onClick={saved ? remove : download}
-                disabled={progress !== null}
+                disabled={downloading !== null}
                 title={saved ? "もう一度押すと端末から削除します" : undefined}
               >
-                {progress
-                  ? `ダウンロード中 ${progress.done} / ${progress.total}`
+                {downloading
+                  ? `ダウンロード中 ${downloading.done} / ${downloading.total}`
                   : saved
                     ? "✓ ダウンロード済み"
                     : "音声"}
@@ -418,7 +501,7 @@ function ChapterCard({
               <button
                 className="btn-secondary"
                 onClick={downloadNotes}
-                disabled={progress !== null}
+                disabled={downloading !== null}
               >
                 解説
               </button>
@@ -751,16 +834,20 @@ function ResultView({
 
 function ChapterDone({
   chapter,
-  scores,
+  ids,
+  progress,
   onRestart,
   onBack,
 }: {
   chapter: ChapterMeta | undefined;
-  scores: Record<number, number>;
+  ids: number[];
+  progress: Progress;
   onRestart: () => void;
   onBack: () => void;
 }) {
-  const values = Object.values(scores);
+  const values = ids
+    .map((id) => progress[id])
+    .filter((v): v is number => v !== undefined);
   const average =
     values.length === 0
       ? 0
@@ -777,19 +864,19 @@ function ChapterDone({
           </span>
         </div>
         <div>
-          {Object.entries(scores)
-            .sort((a, b) => Number(a[0]) - Number(b[0]))
-            .map(([id, s], i) => (
+          {ids.map((id, i) =>
+            progress[id] === undefined ? null : (
               <span className="chip" key={id}>
-                第{i + 1}問 {s}
+                第{i + 1}問 {progress[id]}
               </span>
-            ))}
+            )
+          )}
         </div>
       </section>
 
       <div className="actions">
         <button className="btn-primary" onClick={onRestart}>
-          もう一度始める
+          記録を消してもう一度始める
         </button>
         <button className="btn-secondary" onClick={onBack}>
           章を選び直す
