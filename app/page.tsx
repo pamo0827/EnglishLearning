@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { grade, type GradeResult } from "@/lib/grade";
 import { unseal, type Sealed } from "@/lib/crypto";
+import { Reading } from "./Reading";
 
 /** GitHub Pages のプロジェクトページ配下で動かすための接頭辞 */
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
@@ -53,7 +54,10 @@ async function fetchAnswer(id: number): Promise<Answer> {
   return unseal<Answer>(id, (await res.json()) as Sealed);
 }
 
+type Mode = "dictation" | "reading";
+
 export default function Page() {
+  const [mode, setMode] = useState<Mode>("dictation");
   const [index, setIndex] = useState<Index | null>(null);
   const [chapterId, setChapterId] = useState<number | null>(null);
   const [position, setPosition] = useState(0);
@@ -159,22 +163,45 @@ export default function Page() {
 
   return (
     <main className="stack-xl">
-      <header className="row-between">
-        <div>
-          <div className="app-title">ディクテーション</div>
-          {chapter && (
-            <div className="muted" style={{ fontSize: 14 }}>
-              {chapter.title}
-            </div>
+      <header className="stack-md">
+        <div className="row-between">
+          <div>
+            <div className="app-title">英語学習</div>
+            {mode === "dictation" && chapter && (
+              <div className="muted" style={{ fontSize: 14 }}>
+                {chapter.title}
+              </div>
+            )}
+          </div>
+          {mode === "dictation" && chapterId !== null && (
+            <button className="btn-secondary" onClick={backToChapters}>
+              章を選び直す
+            </button>
           )}
         </div>
-        {chapterId !== null && (
-          <button className="btn-secondary" onClick={backToChapters}>
-            章を選び直す
+
+        <div className="modes" role="group" aria-label="学習モード">
+          <button
+            className={`mode-btn${mode === "dictation" ? " is-active" : ""}`}
+            onClick={() => setMode("dictation")}
+            aria-pressed={mode === "dictation"}
+          >
+            ディクテーション
           </button>
-        )}
+          <button
+            className={`mode-btn${mode === "reading" ? " is-active" : ""}`}
+            onClick={() => setMode("reading")}
+            aria-pressed={mode === "reading"}
+          >
+            長文読解
+          </button>
+        </div>
       </header>
 
+      {mode === "reading" ? (
+        <Reading />
+      ) : (
+        <>
       {currentId !== undefined && !finished && (
         <audio
           ref={audioRef}
@@ -227,6 +254,8 @@ export default function Page() {
       )}
 
       {error && <p className="error">{error}</p>}
+        </>
+      )}
     </main>
   );
 }

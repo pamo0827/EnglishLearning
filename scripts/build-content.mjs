@@ -20,6 +20,9 @@ const ENC_DIR = path.join(DATA_DIR, "enc");
 const AUDIO_DIR = path.join(ROOT, "public", "audio");
 
 const { CHAPTERS, QUESTIONS } = await import("../content/questions.ts");
+const { READING_CHAPTERS, READING_SETS, SPEED_RANKS } = await import(
+  "../content/reading.ts"
+);
 const { seal } = await import("../lib/crypto.ts");
 
 async function hasAudio(id) {
@@ -94,3 +97,113 @@ for (const c of chapters) {
   );
 }
 console.log("正解の漏洩チェック: OK");
+
+/* ------------------------------------------------------------------ *
+ * 長文読解
+ *
+ * 本文と設問文・選択肢は読むために必要なので公開する。
+ * 隠すのは「どれが正解か」と解説だけ。
+ * ------------------------------------------------------------------ */
+
+const READING_ENC_DIR = path.join(DATA_DIR, "reading-enc");
+await fs.rm(READING_ENC_DIR, { recursive: true, force: true });
+await fs.mkdir(READING_ENC_DIR, { recursive: true });
+
+const sets = [];
+for (const set of READING_SETS) {
+  sets.push({
+    id: set.id,
+    chapter: set.chapter,
+    format: set.format,
+    docType: set.docType,
+    title: set.title,
+    passages: set.passages,
+    // 設問文と選択肢だけ。answer / evidence / why / choiceNotes は出さない
+    questions: set.questions.map((q) => ({
+      stem: q.stem,
+      choices: q.choices,
+    })),
+    targetSecPerQuestion: set.targetSecPerQuestion,
+    wordCount: set.passages
+      .map((p) => p.body.trim().split(/\s+/).length)
+      .reduce((a, b) => a + b, 0),
+  });
+
+  const sealed = await seal(`reading:${set.id}`, {
+    questions: set.questions.map((q) => ({
+      answer: q.answer,
+      type: q.type,
+      evidence: q.evidence,
+      why: q.why,
+      choiceNotes: q.choiceNotes,
+    })),
+  });
+  await fs.writeFile(
+    path.join(READING_ENC_DIR, `${set.id}.json`),
+    JSON.stringify(sealed)
+  );
+}
+
+const readingChapters = READING_CHAPTERS.map((c) => {
+  const inChapter = sets.filter((s) => s.chapter === c.id);
+  return {
+    id: c.id,
+    title: c.title,
+    setCount: inChapter.length,
+    questionCount: inChapter.reduce((n, s) => n + s.questions.length, 0),
+  };
+});
+
+await fs.writeFile(
+  path.join(DATA_DIR, "reading.json"),
+  JSON.stringify(
+    {
+      chapters: readingChapters,
+      sets,
+      // Infinity は JSON にできないので、最後のランクは null（上限なし）にする
+      ranks: SPEED_RANKS.map((r) => ({
+        rank: r.rank,
+        maxSec: Number.isFinite(r.maxSec) ? r.maxSec : null,
+        label: r.label,
+      })),
+    },
+    null,
+    2
+  )
+);
+
+// 公開データに解説が混ざっていないか検査する。
+// 解説は本文の英語を引用するので、英語ごと照合すると引用部分に一致して
+// 誤検知する。本文は英語しか含まないため、解説の「日本語だけの塊」で照合する。
+const readingText = await fs.readFile(path.join(DATA_DIR, "reading.json"), "utf8");
+const japaneseRuns = (text) =>
+  (text.match(/[ぁ-んァ-ヴ一-龯ー]{8,}/g) ?? []);
+
+const readingLeaks = [];
+for (const set of READING_SETS) {
+  for (const [i, q] of set.questions.entries()) {
+    const check = (label, text) => {
+      for (const run of japaneseRuns(text)) {
+        if (readingText.includes(run)) {
+          readingLeaks.push(`set${set.id} Q${i + 1} ${label}: ${run}`);
+        }
+      }
+    };
+    check("why", q.why);
+    for (const n of q.choiceNotes) check("note", n);
+    // 正解の添字が公開データに出ていないことも確かめる
+    if (readingText.includes(`"answer"`)) readingLeaks.push(`set${set.id} answer`);
+  }
+}
+if (readingLeaks.length > 0) {
+  console.error(`解説が reading.json へ漏れています: ${readingLeaks.join(", ")}`);
+  process.exit(1);
+}
+
+console.log(
+  `\n長文読解: 章 ${readingChapters.length} / セット ${sets.length} / 設問 ${sets.reduce((n, s) => n + s.questions.length, 0)}`
+);
+for (const c of readingChapters) {
+  console.log(`  ${c.title}  ${c.setCount}セット ${c.questionCount}問`);
+}
+console.log("解説の漏洩チェック: OK");

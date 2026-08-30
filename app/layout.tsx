@@ -9,8 +9,8 @@ import "./globals.css";
 const CF_BEACON_TOKEN = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN ?? "";
 
 export const metadata: Metadata = {
-  title: "ディクテーション",
-  description: "ネイティブの自然な英語を聞き取って書き取り、聞き取れなかった原因を確かめる練習",
+  title: "英語学習",
+  description: "ディクテーションと長文読解。聞き取れなかった原因と、選択肢を切る根拠を確かめる練習",
 };
 
 export default function RootLayout({

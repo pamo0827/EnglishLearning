@@ -30,11 +30,15 @@ function subtle(): SubtleCrypto {
   return c.subtle;
 }
 
-/** 問題ごとに異なる鍵を導出する。1問の鍵が漏れても他問には波及しない */
-async function deriveKey(questionId: number): Promise<CryptoKey> {
+/**
+ * 問題ごとに異なる鍵を導出する。1問の鍵が漏れても他問には波及しない。
+ * id は数値のほか "reading:3" のような文字列も取る。ディクテーションと
+ * 長文読解で番号が衝突しないよう名前空間を分けるため。
+ */
+async function deriveKey(id: string | number): Promise<CryptoKey> {
   const base = await subtle().importKey(
     "raw",
-    enc.encode(`${SALT}|${questionId}`),
+    enc.encode(`${SALT}|${id}`),
     "PBKDF2",
     false,
     ["deriveKey"]
@@ -68,8 +72,8 @@ function fromBase64(text: string): Uint8Array {
 
 export type Sealed = { iv: string; data: string };
 
-export async function seal(questionId: number, payload: unknown): Promise<Sealed> {
-  const key = await deriveKey(questionId);
+export async function seal(id: string | number, payload: unknown): Promise<Sealed> {
+  const key = await deriveKey(id);
   const iv = globalThis.crypto.getRandomValues(new Uint8Array(12));
   const cipher = await subtle().encrypt(
     { name: "AES-GCM", iv },
@@ -79,8 +83,8 @@ export async function seal(questionId: number, payload: unknown): Promise<Sealed
   return { iv: toBase64(iv), data: toBase64(new Uint8Array(cipher)) };
 }
 
-export async function unseal<T>(questionId: number, sealed: Sealed): Promise<T> {
-  const key = await deriveKey(questionId);
+export async function unseal<T>(id: string | number, sealed: Sealed): Promise<T> {
+  const key = await deriveKey(id);
   const plain = await subtle().decrypt(
     { name: "AES-GCM", iv: fromBase64(sealed.iv) as BufferSource },
     key,
