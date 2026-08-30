@@ -8,6 +8,7 @@ import {
   loadProgress,
   saveProgress,
   clearChapterProgress,
+  DICTATION_KEY,
   type Progress,
 } from "@/lib/progress";
 
@@ -79,7 +80,7 @@ export default function Page() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    setProgress(loadProgress());
+    setProgress(loadProgress(DICTATION_KEY));
   }, []);
 
   useEffect(() => {
@@ -152,7 +153,7 @@ export default function Page() {
       // 進捗は端末に残す。閉じても続きから再開できるようにするため。
       setProgress((prev) => {
         const next = { ...prev, [currentId]: r.score };
-        saveProgress(next);
+        saveProgress(DICTATION_KEY, next);
         return next;
       });
     } catch (e) {
@@ -240,7 +241,7 @@ export default function Page() {
           onRestart={() => {
             setProgress((prev) => {
               const next = clearChapterProgress(prev, order);
-              saveProgress(next);
+              saveProgress(DICTATION_KEY, next);
               return next;
             });
             startChapter(chapterId);

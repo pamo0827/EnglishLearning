@@ -6,14 +6,16 @@
  * 例外を投げる場合があるため。
  */
 
-const KEY = "dictation-progress-v1";
+/** 保存先のキー。モードごとに分ける */
+export const DICTATION_KEY = "dictation-progress-v1";
+export const READING_KEY = "reading-progress-v1";
 
-/** 問題 id → 直近のスコア（0〜100） */
+/** 問題（またはセット）id → 直近のスコア（0〜100） */
 export type Progress = Record<number, number>;
 
-export function loadProgress(): Progress {
+export function loadProgress(key: string): Progress {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(key);
     if (!raw) return {};
     const parsed = JSON.parse(raw) as unknown;
     if (typeof parsed !== "object" || parsed === null) return {};
@@ -28,9 +30,9 @@ export function loadProgress(): Progress {
   }
 }
 
-export function saveProgress(progress: Progress): void {
+export function saveProgress(key: string, progress: Progress): void {
   try {
-    localStorage.setItem(KEY, JSON.stringify(progress));
+    localStorage.setItem(key, JSON.stringify(progress));
   } catch {
     // 保存できなくても学習そのものは続けられる
   }

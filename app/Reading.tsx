@@ -3,6 +3,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { unseal, type Sealed } from "@/lib/crypto";
 import {
+  loadProgress,
+  saveProgress,
+  READING_KEY,
+  type Progress,
+} from "@/lib/progress";
+import {
   gradeReading,
   formatDuration,
   type ReadingAnswerKey,
@@ -51,8 +57,13 @@ export function Reading() {
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [now, setNow] = useState(0);
   const [result, setResult] = useState<ReadingResult | null>(null);
+  const [progress, setProgress] = useState<Progress>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setProgress(loadProgress(READING_KEY));
+  }, []);
 
   useEffect(() => {
     fetch(asset("data/reading.json"))
@@ -92,15 +103,20 @@ export function Reading() {
         `reading:${current.id}`,
         (await res.json()) as Sealed
       );
-      setResult(
-        gradeReading(
-          keys.questions,
-          chosen,
-          (Date.now() - startedAt) / 1000,
-          current.targetSecPerQuestion,
-          data.ranks
-        )
+      const r = gradeReading(
+        keys.questions,
+        chosen,
+        (Date.now() - startedAt) / 1000,
+        current.targetSecPerQuestion,
+        data.ranks
       );
+      setResult(r);
+      // 正答率を端末に残す。一覧の升目に前回の結果を出すため。
+      setProgress((prev) => {
+        const next = { ...prev, [current.id]: r.score };
+        saveProgress(READING_KEY, next);
+        return next;
+      });
       window.scrollTo(0, 0);
     } catch (e) {
       setError(e instanceof Error ? e.message : "採点に失敗しました");
@@ -118,7 +134,7 @@ export function Reading() {
   if (error && !data) return <p className="error">{error}</p>;
   if (!data) return <p className="muted">読み込み中…</p>;
 
-  if (!current) return <SetList data={data} onStart={start} />;
+  if (!current) return <SetList data={data} progress={progress} onStart={start} />;
 
   return (
     <div className="stack-xl">
@@ -153,59 +169,76 @@ export function Reading() {
 
 function SetList({
   data,
+  progress,
   onStart,
 }: {
   data: ReadingData;
+  progress: Progress;
   onStart: (s: ReadingSetMeta) => void;
 }) {
   return (
     <div className="stack-xl">
-      {data.chapters.map((c) => (
-        <div key={c.id} className="stack-md">
-          {/* 章の見出し。ディクテーションの章カードと同じ形にそろえる */}
-          <div>
-            <div style={{ fontWeight: 600, fontSize: 17 }}>{c.title}</div>
-            <div className="label" style={{ marginTop: 4 }}>
-              全{c.setCount}セット {c.questionCount}問
-            </div>
-          </div>
+      <div className="stack-md">
+        {data.chapters.map((c) => {
+          const sets = data.sets.filter((s) => s.chapter === c.id);
+          // 未挑戦の最初のセットから始める。全部済みなら先頭に戻る。
+          const firstUnanswered = sets.findIndex(
+            (s) => progress[s.id] === undefined
+          );
+          const resumeAt = firstUnanswered === -1 ? 0 : firstUnanswered;
 
-          {data.sets
-            .filter((s) => s.chapter === c.id)
-            .map((s) => (
-              <section key={s.id} className="card stack-md">
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: 17 }}>{s.title}</div>
-                  <div className="label" style={{ marginTop: 4 }}>
-                    {FORMAT_LABEL[s.format]} ・ {s.docType} ・ {s.wordCount}語 ・{" "}
-                    {s.questions.length}問
-                  </div>
+          return (
+            <section key={c.id} className="card stack-md">
+              <div>
+                <div style={{ fontWeight: 600, fontSize: 17 }}>{c.title}</div>
+                <div className="label" style={{ marginTop: 4 }}>
+                  全{c.setCount}セット {c.questionCount}問
                 </div>
+              </div>
 
-                <div className="actions">
-                  <button className="btn-primary" onClick={() => onStart(s)}>
-                    始める
-                  </button>
-                </div>
+              <div className="actions">
+                <button
+                  className="btn-primary"
+                  onClick={() => onStart(sets[resumeAt])}
+                  disabled={sets.length === 0}
+                >
+                  {resumeAt > 0 ? `第${resumeAt + 1}セットから続ける` : "始める"}
+                </button>
+              </div>
 
-                <div className="stack-sm">
-                  <div className="label">目標</div>
-                  <div className="row" style={{ gap: 16, flexWrap: "wrap" }}>
-                    <span className="chip">
-                      {s.targetSecPerQuestion}秒 / 問
-                    </span>
-                    <span className="chip">
-                      全体{" "}
-                      {formatDuration(
-                        s.questions.length * s.targetSecPerQuestion
-                      )}
-                    </span>
-                  </div>
-                </div>
-              </section>
-            ))}
-        </div>
-      ))}
+              {/* どのセットからでも入れる。升目が番号と正答率を示す。 */}
+              <div className="q-grid">
+                {sets.map((s, i) => {
+                  const score = progress[s.id];
+                  const state =
+                    score === undefined
+                      ? ""
+                      : score >= 85
+                        ? " is-good"
+                        : score >= 55
+                          ? " is-mid"
+                          : " is-low";
+                  return (
+                    <button
+                      key={s.id}
+                      className={`q-cell${state}`}
+                      onClick={() => onStart(s)}
+                      title={`第${i + 1}セット ${FORMAT_LABEL[s.format]}・${s.docType}・${s.wordCount}語・${s.questions.length}問${
+                        score === undefined ? "（未挑戦）" : `（正答率${score}%）`
+                      }`}
+                    >
+                      <span className="q-cell-no">{i + 1}</span>
+                      <span className="q-cell-score">
+                        {score === undefined ? "—" : score}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          );
+        })}
+      </div>
 
       <RankTable ranks={data.ranks} />
     </div>
@@ -267,7 +300,8 @@ function SolveView({
         <div className="row" style={{ alignItems: "baseline", gap: 8 }}>
           <span className="question-no">{set.title}</span>
           <span className="label">
-            {FORMAT_LABEL[set.format]} ・ {set.wordCount}語
+            {FORMAT_LABEL[set.format]} ・ {set.docType} ・ {set.wordCount}語 ・{" "}
+            {set.questions.length}問 ・ 目標 {set.targetSecPerQuestion}秒/問
           </span>
         </div>
         <div className="row" style={{ gap: 12 }}>
