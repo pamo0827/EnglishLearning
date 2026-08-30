@@ -56,6 +56,7 @@ export type ReadingChapter = {
 
 export const READING_CHAPTERS: ReadingChapter[] = [
   { id: 1, title: "第1章" },
+  { id: 2, title: "第2章" },
 ];
 
 /**
@@ -683,6 +684,781 @@ September 9 | Fairmount Conference Center
           "正解。",
           "基調講演は Ortiz の担当ではありません。",
           "会場の手配をするとは書かれていません。",
+        ],
+      },
+    ],
+  },
+  /* ---------------- 第2章 ---------------- */
+
+  {
+    id: 7,
+    chapter: 2,
+    format: "single",
+    docType: "請求書",
+    title: "請求書",
+    targetSecPerQuestion: 50,
+    passages: [
+      {
+        label: "Invoice",
+        body: `WESTBROOK SUPPLY CO.
+Invoice #48812
+
+Bill To: Harlow Design Studio, 14 Pinehurst Avenue, Suite 300
+Order Date: July 8    Ship Date: July 11    Terms: Net 30
+
+Item                              Qty    Unit Price    Total
+Drafting paper, A1 (100 sheets)    12       $18.00     $216.00
+Fine-liner pen set                  8       $24.50     $196.00
+Cutting mat, large                  3       $41.00     $123.00
+Storage tube                        6        $9.75      $58.50
+
+                                        Subtotal      $593.50
+                                        Shipping         $0.00
+                                        Tax (6%)        $35.61
+                                        Total Due      $629.11
+
+Shipping is waived on orders over $500.
+
+Payment is due by August 10. A 2% discount applies to payments received within ten days of the order date. Returns are accepted within 30 days provided items are unopened; custom-cut materials are non-returnable.
+
+Questions about this invoice may be directed to accounts@westbrooksupply.com.`,
+      },
+    ],
+    questions: [
+      {
+        stem: "Why was no shipping charge applied to the order?",
+        choices: [
+          "The customer picked up the items directly.",
+          "The order total exceeded a certain amount.",
+          "The items were shipped in a single tube.",
+          "The customer has an ongoing service contract.",
+        ],
+        answer: 1,
+        type: "詳細",
+        evidence: "Shipping is waived on orders over $500. / Subtotal $593.50",
+        why:
+          "請求書では、金額の欄と条件を書いた一文を突き合わせます。$593.50 が $500 を超えているので免除条件を満たします。数字が2か所に分かれている形は請求書の設問で頻出です。",
+        choiceNotes: [
+          "受け取り方法の記述はありません。Ship Date があるので発送されています。",
+          "正解。waive は「（料金などを）免除する」で、Part 7 の請求書・広告でよく出ます。",
+          "Storage tube は商品の1つで、発送方法とは関係ありません。表の中の語をそのまま使った誤答です。",
+          "契約についての記述はありません。Terms: Net 30 は支払期限の条件です。",
+        ],
+      },
+      {
+        stem: "What must a customer do to receive a discount?",
+        choices: [
+          "Order more than $500 worth of goods",
+          "Pay within ten days of the order date",
+          "Return unopened items within 30 days",
+          "Contact the accounts department in advance",
+        ],
+        answer: 1,
+        type: "詳細",
+        evidence:
+          "A 2% discount applies to payments received within ten days of the order date.",
+        why:
+          "discount という語を目印に1文を探せば決まります。ただし起算日に注意。ここは order date（7月8日）であって、支払期限の August 10 でも Ship Date でもありません。",
+        choiceNotes: [
+          "$500 超は送料免除の条件です。同じ文書内の別の条件を持ってくる典型的な誤答です。",
+          "正解。",
+          "30日以内は返品の条件です。",
+          "問い合わせ先は最後に書かれているだけで、割引の条件ではありません。",
+        ],
+      },
+      {
+        stem: "What is stated about returns?",
+        choices: [
+          "They require approval from the accounts department.",
+          "They are accepted only within ten days.",
+          "Custom-cut materials cannot be returned.",
+          "Shipping costs are not refunded.",
+        ],
+        answer: 2,
+        type: "詳細",
+        evidence:
+          "Returns are accepted within 30 days provided items are unopened; custom-cut materials are non-returnable.",
+        why:
+          "セミコロンの後ろは例外や補足を置く場所です。条件を問う設問では、but / however / provided / except とセミコロンの後ろを必ず読むこと。",
+        choiceNotes: [
+          "承認の記述はありません。",
+          "10日は割引の条件です。返品は30日以内です。数字の入れ替えを狙った誤答です。",
+          "正解。non-returnable は「返品不可」。",
+          "送料の返金には触れていません。そもそも送料は免除されています。",
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 8,
+    chapter: 2,
+    format: "single",
+    docType: "求人",
+    title: "求人広告",
+    targetSecPerQuestion: 55,
+    passages: [
+      {
+        label: "Job Posting",
+        body: `LEDGERWOOD COMMUNITY LIBRARY
+Position: Programs Coordinator (Part-Time)
+
+Ledgerwood Community Library seeks a Programs Coordinator to plan and run public events, including author talks, children's reading hours, and seasonal workshops. This is a 25-hour-per-week position with occasional evening and weekend commitments.
+
+RESPONSIBILITIES
+- Develop a quarterly calendar of public programs
+- Coordinate with visiting presenters on scheduling and equipment
+- Track attendance and prepare quarterly reports for the board
+- Manage the programs budget of approximately $40,000 annually
+
+REQUIREMENTS
+- Two years of experience organizing public events
+- Strong written communication skills
+- Familiarity with basic budgeting
+
+A degree in library science is preferred but not required. Candidates with backgrounds in education, museums, or community organizing are encouraged to apply.
+
+Submit a resume and a one-page description of a program you would propose for our community to hiring@ledgerwoodlibrary.org by May 20. Interviews will be held during the first week of June.`,
+      },
+    ],
+    questions: [
+      {
+        stem: "What is a stated requirement for the position?",
+        choices: [
+          "A degree in library science",
+          "Experience organizing public events",
+          "A background in museum work",
+          "Availability on weekday mornings",
+        ],
+        answer: 1,
+        type: "詳細",
+        evidence: "REQUIREMENTS — Two years of experience organizing public events",
+        why:
+          "求人では REQUIREMENTS（必須）と preferred（歓迎）を必ず区別すること。この2つの取り違えを狙う設問は Part 7 で頻出です。",
+        choiceNotes: [
+          "preferred but not required と明記されています。歓迎条件であって必須ではありません。",
+          "正解。",
+          "encouraged to apply（応募を歓迎）であって条件ではありません。",
+          "勤務は occasional evening and weekend commitments とあり、平日午前の指定はありません。",
+        ],
+      },
+      {
+        stem: "What are applicants asked to submit in addition to a resume?",
+        choices: [
+          "Two professional references",
+          "A quarterly budget proposal",
+          "A description of a proposed program",
+          "A copy of an academic transcript",
+        ],
+        answer: 2,
+        type: "詳細",
+        evidence:
+          "Submit a resume and a one-page description of a program you would propose for our community",
+        why:
+          "応募書類は最終段落に書かれます。in addition to（〜に加えて）と問われたら、and で並べられたもう一方を探すこと。",
+        choiceNotes: [
+          "推薦者の記述はありません。求人広告でよくある要素ですが、この文書にはありません。",
+          "予算管理は職務内容の1つで、応募時の提出物ではありません。",
+          "正解。",
+          "成績証明書の記述はありません。学位すら必須ではありません。",
+        ],
+      },
+      {
+        stem: "What is indicated about the hiring process?",
+        choices: [
+          "Applications will be accepted until the end of June.",
+          "Interviews will take place after the application deadline.",
+          "Candidates will be asked to run a sample program.",
+          "The position will begin immediately after the interviews.",
+        ],
+        answer: 1,
+        type: "推測",
+        evidence:
+          "Submit ... by May 20. Interviews will be held during the first week of June.",
+        why:
+          "日付が2つ出てきたら前後関係を確認します。5月20日が締切、6月第1週が面接なので、面接は締切より後です。日付の順序を問う設問は複数文書でも頻出です。",
+        choiceNotes: [
+          "6月末は面接ではなく、締切は5月20日です。",
+          "正解。",
+          "模擬プログラムの実施は求められていません。求められるのは1ページの説明文です。",
+          "着任時期には触れていません。",
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 9,
+    chapter: 2,
+    format: "single",
+    docType: "記事",
+    title: "業界の記事",
+    targetSecPerQuestion: 60,
+    passages: [
+      {
+        label: "Article",
+        body: `Small Bakeries Turn to Shared Kitchens
+
+PORTLAND (May 14) — When Delia Marchetti outgrew her apartment oven three years ago, she faced the same choice that stops many food entrepreneurs: sign a lease she could not afford, or stop growing.
+
+She chose a third option. Marchetti now bakes at Grainhouse, one of a growing number of commercial kitchens that rent certified space by the hour. Members book slots online, store ingredients in shared cold rooms, and share the cost of equipment that would be impossible to buy alone.
+
+The model is not new — shared kitchens have operated in major cities since the 1990s — but demand has risen sharply. Grainhouse reported a 40 percent increase in membership last year, and two similar facilities opened in the region during the same period.
+
+The arrangement has limits. Members cannot leave equipment set up between sessions, which makes multi-day processes difficult. Scheduling can also be tight; Marchetti books her slots six weeks ahead and says the most desirable early-morning hours fill within hours of being released.
+
+Still, she is not looking to leave. "A lease would have doubled my costs before I had the customers to cover it," she said. "Here I pay for the hours I actually use."`,
+      },
+    ],
+    questions: [
+      {
+        stem: "What is the purpose of the article?",
+        choices: [
+          "To review a new bakery in Portland",
+          "To describe a way small food businesses find kitchen space",
+          "To announce the opening of a commercial facility",
+          "To compare the costs of leasing and buying equipment",
+        ],
+        answer: 1,
+        type: "主旨",
+        evidence:
+          "Small Bakeries Turn to Shared Kitchens / commercial kitchens that rent certified space by the hour",
+        why:
+          "記事の主旨は見出しと第2段落までで決まります。個人の話（Marchetti）は具体例として置かれているだけで、主題は shared kitchens という仕組みそのものです。",
+        choiceNotes: [
+          "特定の店の批評ではありません。Marchetti は例として登場します。",
+          "正解。",
+          "2施設の開業に触れていますが、それは需要の伸びを示す根拠であって主題ではありません。本文の一部を主旨と取り違えさせる誤答です。",
+          "賃借と設備購入の費用比較はしていません。",
+        ],
+      },
+      {
+        stem: "What is suggested about shared kitchens?",
+        choices: [
+          "They were first introduced in Portland.",
+          "They have existed for several decades.",
+          "They are less expensive than home kitchens.",
+          "They are limited to baking businesses.",
+        ],
+        answer: 1,
+        type: "推測",
+        evidence:
+          "The model is not new — shared kitchens have operated in major cities since the 1990s",
+        why:
+          "since the 1990s から several decades（数十年）を導きます。年代が出てきたら、選択肢の「何年前か」という言い換えに注意すること。",
+        choiceNotes: [
+          "Portland が発祥だとは書かれていません。記事の舞台がそこであるだけです。地名を発祥と結び付けないこと。",
+          "正解。",
+          "自宅の台所との比較はありません。比較されているのは賃借（a lease）です。",
+          "food entrepreneurs と広く書かれており、パン屋に限る記述はありません。",
+        ],
+      },
+      {
+        stem: "According to the article, what is a drawback of the arrangement?",
+        choices: [
+          "Members must purchase their own equipment.",
+          "Cold storage is not available.",
+          "Equipment cannot be left in place between sessions.",
+          "Membership fees increased by 40 percent.",
+        ],
+        answer: 2,
+        type: "詳細",
+        evidence:
+          "Members cannot leave equipment set up between sessions, which makes multi-day processes difficult.",
+        why:
+          "欠点を問う設問は The arrangement has limits. のような転換の一文を探すこと。その直後に列挙されます。",
+        choiceNotes: [
+          "share the cost of equipment とあり、むしろ共同で費用を分担しています。",
+          "store ingredients in shared cold rooms とあり、冷蔵庫はあります。",
+          "正解。",
+          "40 percent は会員数の増加率であって会費ではありません。数字の対象をすり替えた誤答です。",
+        ],
+      },
+      {
+        stem: "What does Ms. Marchetti indicate about her costs?",
+        choices: [
+          "She pays only for the time she uses.",
+          "She spends more than she did at home.",
+          "She shares her fees with another member.",
+          "She expects them to double next year.",
+        ],
+        answer: 0,
+        type: "詳細",
+        evidence: "\"Here I pay for the hours I actually use.\"",
+        why:
+          "記事の締めに置かれた発言は、その人の結論です。設問1つ分の情報を持っていることが多いので必ず読むこと。",
+        choiceNotes: [
+          "正解。",
+          "自宅との比較はしていません。比較対象は借りた場合の費用です。",
+          "費用の分担相手についての記述はありません。",
+          "doubled は「賃借していたら倍になっていた」という仮定の話で、これからの予測ではありません。仮定法を事実として読ませる誤答です。",
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 10,
+    chapter: 2,
+    format: "double",
+    docType: "広告＋メール",
+    title: "二重文書（広告と問い合わせ）",
+    targetSecPerQuestion: 65,
+    passages: [
+      {
+        label: "Advertisement",
+        body: `HOLLAND & REEVE TRANSLATION
+Professional Language Services Since 2004
+
+Document Translation — from $0.14 per word
+Certified Translation (legal, medical, academic) — from $0.22 per word
+Website Localization — quoted per project
+Same-Day Rush Service — add 50% to base rate
+
+All translations are reviewed by a second linguist before delivery. Standard turnaround is three business days for documents under 5,000 words.
+
+Volume discount: 10% off orders over 20,000 words.
+
+Request a free quote at holland-reeve.com or call 555-0142.
+Offices in Chicago and Toronto.`,
+      },
+      {
+        label: "E-mail",
+        body: `To: quotes@holland-reeve.com
+From: n.abara@fenwickmedical.com
+Date: February 3
+Subject: Quote request — clinical documents
+
+Hello,
+
+We need three clinical trial summaries translated from English into Spanish. Together they come to roughly 8,400 words. Because these will be submitted to a regulatory body, they must be certified.
+
+We would need them by February 10. I understand this may fall outside your standard turnaround, so please let me know if a rush fee would apply.
+
+One more question: your website mentions a discount for large orders. Would three separate documents submitted together count as a single order for that purpose?
+
+Thank you,
+Nadia Abara
+Fenwick Medical`,
+      },
+    ],
+    questions: [
+      {
+        stem: "What is the purpose of the e-mail?",
+        choices: [
+          "To complain about a delayed translation",
+          "To request pricing information for a project",
+          "To apply for a position as a translator",
+          "To confirm the delivery of completed documents",
+        ],
+        answer: 1,
+        type: "主旨",
+        evidence: "Subject: Quote request — clinical documents",
+        why:
+          "件名が目的をそのまま示しています。二重文書でも、目的を問う設問は片方の冒頭だけで解けます。",
+        choiceNotes: [
+          "苦情ではありません。まだ発注していません。",
+          "正解。quote は「見積もり」。",
+          "求人への応募ではありません。",
+          "納品の確認ではありません。これから依頼する段階です。",
+        ],
+      },
+      {
+        stem: "At what rate will Ms. Abara's documents most likely be charged?",
+        choices: [
+          "$0.14 per word",
+          "$0.22 per word",
+          "A per-project quote",
+          "10% off the base rate",
+        ],
+        answer: 1,
+        type: "推測",
+        evidence:
+          "広告: Certified Translation (legal, medical, academic) — from $0.22 per word ／ メール: they must be certified",
+        why:
+          "二重文書の典型です。メールで条件（certified・medical）を掴み、広告の料金表で該当する行を引きます。2つの文書をつなぐ語（ここでは certified）を探すのが解き方です。",
+        choiceNotes: [
+          "$0.14 は通常の文書翻訳です。認証翻訳ではありません。",
+          "正解。",
+          "per project は Website Localization の料金体系です。",
+          "10% 引きは 20,000語超の条件で、8,400語では届きません。",
+        ],
+      },
+      {
+        stem: "What is suggested about Ms. Abara's deadline?",
+        choices: [
+          "It falls within the standard turnaround.",
+          "It will likely require an additional fee.",
+          "It cannot be met by the company.",
+          "It was extended at her request.",
+        ],
+        answer: 1,
+        type: "推測",
+        evidence:
+          "メール: Date: February 3 / We would need them by February 10 ／ 広告: Standard turnaround is three business days for documents under 5,000 words. / Same-Day Rush Service — add 50%",
+        why:
+          "8,400語は standard turnaround の条件（5,000語未満）を外れます。本人も this may fall outside your standard turnaround と述べており、追加料金の可能性が高いと導けます。**条件から外れる**ことに気づけるかを問う設問です。",
+        choiceNotes: [
+          "標準の納期条件は5,000語未満で、8,400語は対象外です。",
+          "正解。",
+          "対応不可とは書かれていません。追加料金の有無を尋ねている段階です。断定しすぎる選択肢に注意。",
+          "期限が延長された事実はありません。",
+        ],
+      },
+      {
+        stem: "Why is Ms. Abara unlikely to receive the volume discount?",
+        choices: [
+          "Her order is below the required word count.",
+          "The discount applies only to certified translation.",
+          "She is submitting documents separately.",
+          "The discount expired before February.",
+        ],
+        answer: 0,
+        type: "推測",
+        evidence:
+          "広告: Volume discount: 10% off orders over 20,000 words ／ メール: roughly 8,400 words",
+        why:
+          "数量条件は必ず数字を突き合わせること。8,400 < 20,000 なので条件を満たしません。メール側で本人が質問している内容が、そのまま設問になる形は頻出です。",
+        choiceNotes: [
+          "正解。",
+          "割引の対象を認証翻訳に限る記述はありません。",
+          "まとめて提出するかどうかを彼女は質問していますが、そもそも語数が足りません。彼女の質問文につられて選ばせる誤答です。",
+          "期限の記述はありません。",
+        ],
+      },
+      {
+        stem: "What is indicated about all translations by the company?",
+        choices: [
+          "They are completed within one business day.",
+          "They are checked by a second linguist.",
+          "They are available in Spanish only.",
+          "They must be requested by telephone.",
+        ],
+        answer: 1,
+        type: "詳細",
+        evidence:
+          "All translations are reviewed by a second linguist before delivery.",
+        why:
+          "All ... で始まる一文は「全体に共通すること」を述べる場所で、設問になりやすい箇所です。料金表の下の説明文は読み飛ばさないこと。",
+        choiceNotes: [
+          "1営業日は Same-Day Rush Service の話で、標準は3営業日です。",
+          "正解。",
+          "スペイン語は依頼者側の希望言語です。会社が対応する言語の限定は書かれていません。",
+          "ウェブサイトか電話のどちらでもよいと書かれています。",
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 11,
+    chapter: 2,
+    format: "double",
+    docType: "メール往復",
+    title: "二重文書（問い合わせと返信）",
+    targetSecPerQuestion: 65,
+    passages: [
+      {
+        label: "E-mail 1",
+        body: `To: service@northgate-appliance.com
+From: t.okonkwo@mailbridge.net
+Date: October 6
+Subject: Order 77-2291 — wrong model delivered
+
+Hello,
+
+I received my order this morning, but the unit delivered is the NG-400 rather than the NG-450 I ordered. The invoice in the box lists the NG-450, so I assume the wrong item was pulled from the warehouse.
+
+I need a working unit by October 14 for a rental property changeover. If a replacement cannot arrive by then, I would rather cancel and order elsewhere.
+
+The box is unopened apart from the outer seal. Please advise on how to return it.
+
+Tunde Okonkwo`,
+      },
+      {
+        label: "E-mail 2",
+        body: `To: t.okonkwo@mailbridge.net
+From: service@northgate-appliance.com
+Date: October 6
+Subject: RE: Order 77-2291 — wrong model delivered
+
+Dear Mr. Okonkwo,
+
+I apologize for the error. Our warehouse confirms that two model numbers were shelved in the wrong bay last week, and yours was affected.
+
+An NG-450 is in stock at our Fairview depot and can reach you by October 9. We will dispatch it as soon as you confirm, and a carrier will collect the NG-400 at the same visit, so you will not need to arrange a return separately.
+
+Because the error was ours, I have applied a $60 credit to your account. It will appear within two business days and can be used on any future order.
+
+Please reply to confirm the replacement.
+
+Marisol Vance
+Customer Service`,
+      },
+    ],
+    questions: [
+      {
+        stem: "What problem does Mr. Okonkwo report?",
+        choices: [
+          "An item arrived damaged.",
+          "An order was delivered late.",
+          "The wrong model was sent.",
+          "An invoice contained an error.",
+        ],
+        answer: 2,
+        type: "主旨",
+        evidence:
+          "the unit delivered is the NG-400 rather than the NG-450 I ordered",
+        why:
+          "件名と第1文で問題が示されます。rather than は「〜ではなく」で、取り違えを述べる語です。",
+        choiceNotes: [
+          "破損の記述はありません。箱は未開封です。",
+          "配達は当日朝に届いており、遅延ではありません。",
+          "正解。",
+          "請求書には正しく NG-450 と書かれています。誤りは倉庫の出荷側です。文書内の要素をずらした誤答です。",
+        ],
+      },
+      {
+        stem: "What is indicated about the cause of the problem?",
+        choices: [
+          "A customer entered the wrong model number.",
+          "Items were stored in an incorrect location.",
+          "A carrier delivered to the wrong address.",
+          "The NG-450 was out of stock.",
+        ],
+        answer: 1,
+        type: "詳細",
+        evidence:
+          "two model numbers were shelved in the wrong bay last week, and yours was affected",
+        why:
+          "原因は返信側の文書にあります。二重文書では、問題の提示と原因の説明が別の文書に分かれるのが定石です。",
+        choiceNotes: [
+          "注文自体は正しく、請求書も NG-450 です。",
+          "正解。shelve は「棚に置く」、bay は「区画」。",
+          "住所の誤りではありません。届いたのは本人です。",
+          "An NG-450 is in stock とあり、在庫はあります。",
+        ],
+      },
+      {
+        stem: "Will the replacement arrive in time for Mr. Okonkwo's deadline?",
+        choices: [
+          "Yes, five days before it",
+          "Yes, on the day of the deadline",
+          "No, it will arrive one day late",
+          "No, the item must be ordered elsewhere",
+        ],
+        answer: 0,
+        type: "推測",
+        evidence:
+          "メール1: I need a working unit by October 14 ／ メール2: can reach you by October 9",
+        why:
+          "2つの文書にまたがる日付の比較です。10月9日は10月14日の5日前なので間に合います。日付が別々の文書に置かれている形は、二重文書で最も出やすい設問です。",
+        choiceNotes: [
+          "正解。",
+          "当日ではなく5日前です。",
+          "遅れません。",
+          "他社での購入は、間に合わない場合の代替案として本人が挙げただけです。仮定の話を事実として読ませる誤答です。",
+        ],
+      },
+      {
+        stem: "What does Ms. Vance say about returning the NG-400?",
+        choices: [
+          "It should be shipped back at the customer's expense.",
+          "It will be collected when the replacement is delivered.",
+          "It may be kept at no charge.",
+          "It must be returned within two business days.",
+        ],
+        answer: 1,
+        type: "詳細",
+        evidence:
+          "a carrier will collect the NG-400 at the same visit, so you will not need to arrange a return separately",
+        why:
+          "設問の returning を目印に探します。collect（引き取る）が選択肢では be collected に言い換えられています。",
+        choiceNotes: [
+          "so you will not need to arrange a return separately とあり、手配は不要です。",
+          "正解。",
+          "無償で保持できるとは書かれていません。引き取られます。",
+          "two business days は $60 のクレジットが反映されるまでの期間です。数字の対象をすり替えた誤答です。",
+        ],
+      },
+      {
+        stem: "What is suggested about the $60 credit?",
+        choices: [
+          "It must be used within two business days.",
+          "It was requested by Mr. Okonkwo.",
+          "It can be applied to a later purchase.",
+          "It replaces the cost of the NG-450.",
+        ],
+        answer: 2,
+        type: "推測",
+        evidence:
+          "It will appear within two business days and can be used on any future order.",
+        why:
+          "and で結ばれた2つの情報を切り分けること。「2営業日」は反映までの期間、「将来の注文に使える」は用途です。ここを混ぜると誤答を選びます。",
+        choiceNotes: [
+          "2営業日は反映までの期間で、使用期限ではありません。",
+          "本人は要求していません。Because the error was ours と、会社側の判断です。",
+          "正解。",
+          "商品代金の肩代わりではありません。NG-450 は別途発送されます。",
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 12,
+    chapter: 2,
+    format: "triple",
+    docType: "メール＋日程＋社内連絡",
+    title: "三重文書（研修の調整）",
+    targetSecPerQuestion: 70,
+    passages: [
+      {
+        label: "E-mail",
+        body: `To: All Regional Staff
+From: Priya Sandhu, Training Lead
+Date: November 3
+Subject: December safety refresher — sign-up
+
+Everyone,
+
+Our annual safety refresher takes place the week of December 8. Three sessions are offered so that shift coverage is not affected. Each session covers the same material; attend whichever fits your schedule.
+
+Sign up through the staff portal by November 21. If none of the three works for you, reply to me directly and I will arrange a make-up session in January.
+
+Note that the Thursday session is held at the Eastside facility, not at headquarters.
+
+Priya`,
+      },
+      {
+        label: "Schedule",
+        body: `SAFETY REFRESHER — DECEMBER SESSIONS
+
+Monday, December 8, 9:00–11:30 A.M. — Headquarters, Room 110
+Wednesday, December 10, 1:00–3:30 P.M. — Headquarters, Room 110
+Thursday, December 11, 8:00–10:30 A.M. — Eastside Facility, Training Bay
+
+All sessions include a written assessment in the final thirty minutes.
+Bring your employee badge; it is required for entry at both locations.`,
+      },
+      {
+        label: "Memo",
+        body: `MEMO
+To: Warehouse Team B
+From: Ken Adeyemi, Shift Supervisor
+Date: November 5
+
+Team B covers the morning shift on December 8 and December 11. Those of you on those shifts should choose the Wednesday session so that we are not short-handed.
+
+If you have already signed up for another session, let me know by Friday and I will look at swapping coverage.
+
+Also, the Eastside location has no visitor parking. Anyone attending there should plan to use the transit line or arrange a ride.
+
+Ken`,
+      },
+    ],
+    questions: [
+      {
+        stem: "What is the purpose of Ms. Sandhu's e-mail?",
+        choices: [
+          "To announce a change in safety procedures",
+          "To ask staff to register for a training session",
+          "To report the results of an assessment",
+          "To introduce a new training facility",
+        ],
+        answer: 1,
+        type: "主旨",
+        evidence: "Subject: December safety refresher — sign-up / Sign up through the staff portal by November 21.",
+        why:
+          "三重文書でも、目的を問う設問は1つ目の文書の件名と冒頭で決まります。3つ全部を読んでから解き始めないこと。",
+        choiceNotes: [
+          "手順の変更ではなく、既存の内容の再確認研修です。",
+          "正解。",
+          "評価は研修中に行われるもので、結果の報告ではありません。",
+          "Eastside は会場の1つとして触れられているだけで、新設の紹介ではありません。",
+        ],
+      },
+      {
+        stem: "Which session should members of Team B attend?",
+        choices: [
+          "Monday, December 8",
+          "Wednesday, December 10",
+          "Thursday, December 11",
+          "A make-up session in January",
+        ],
+        answer: 1,
+        type: "詳細",
+        evidence:
+          "メモ: Those of you on those shifts should choose the Wednesday session ／ 日程: Wednesday, December 10",
+        why:
+          "指示はメモにあり、曜日から日付を引くのが日程表です。三重文書では「誰が言っているか」を必ず確認すること。ここは Sandhu ではなく上司の Adeyemi の指示です。",
+        choiceNotes: [
+          "12月8日は Team B が朝勤に入る日です。",
+          "正解。",
+          "12月11日も Team B が朝勤に入る日で、しかも Eastside 開催です。",
+          "1月の補講は3つとも都合が合わない人向けです。",
+        ],
+      },
+      {
+        stem: "What is required for entry to the sessions?",
+        choices: [
+          "A completed sign-up form",
+          "An employee badge",
+          "A parking permit",
+          "Approval from a shift supervisor",
+        ],
+        answer: 1,
+        type: "詳細",
+        evidence:
+          "Bring your employee badge; it is required for entry at both locations.",
+        why:
+          "持ち物や入場条件は日程表の欄外に書かれます。3文書のうちどこに書かれているかを探す設問で、required という語が目印になります。",
+        choiceNotes: [
+          "登録はポータルで行うもので、当日持参する書類ではありません。",
+          "正解。",
+          "Eastside には来客用駐車場がないという記述はありますが、許可証の話はありません。",
+          "上司の承認は入場条件ではありません。",
+        ],
+      },
+      {
+        stem: "What problem does Mr. Adeyemi mention about the Eastside facility?",
+        choices: [
+          "It is farther from the transit line.",
+          "It does not have visitor parking.",
+          "Its training room is smaller.",
+          "It opens later than headquarters.",
+        ],
+        answer: 1,
+        type: "詳細",
+        evidence: "the Eastside location has no visitor parking",
+        why:
+          "Eastside は3つの文書すべてに登場します。設問が「誰が述べたか」を指定しているときは、その人の文書だけを見ること。",
+        choiceNotes: [
+          "むしろ transit line の利用を勧めており、遠いとは書かれていません。反対の内容にした誤答です。",
+          "正解。",
+          "部屋の広さには触れていません。",
+          "木曜の Eastside は 8:00 開始で、他の2つより早い時間です。",
+        ],
+      },
+      {
+        stem: "What should an employee do if none of the three sessions is possible?",
+        choices: [
+          "Contact Mr. Adeyemi by Friday",
+          "Sign up through the staff portal anyway",
+          "Reply directly to Ms. Sandhu",
+          "Attend the written assessment only",
+        ],
+        answer: 2,
+        type: "詳細",
+        evidence:
+          "If none of the three works for you, reply to me directly and I will arrange a make-up session in January.",
+        why:
+          "条件文（If ...）は、そのまま設問の条件になります。誰に連絡するのかを取り違えないよう、その文書の書き手を確認すること。ここは Sandhu のメールです。",
+        choiceNotes: [
+          "Adeyemi への金曜連絡は「すでに別のセッションに登録済みの人」向けです。別の条件と混ぜた誤答です。",
+          "3つとも無理な場合の話なので、登録はできません。",
+          "正解。",
+          "筆記評価だけの受講は認められていません。",
         ],
       },
     ],

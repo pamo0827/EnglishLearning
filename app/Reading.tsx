@@ -264,9 +264,6 @@ function RankTable({ ranks }: { ranks: SpeedRank[] }) {
           </div>
         ))}
       </div>
-      <p className="muted" style={{ fontSize: 12, margin: 0 }}>
-        基準は TOEIC Part 7 の 54問／54分＝1問60秒。制限時間は設けていません。
-      </p>
     </section>
   );
 }
