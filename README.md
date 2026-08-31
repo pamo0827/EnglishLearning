@@ -128,6 +128,45 @@ gh variable set CF_BEACON_TOKEN --body "<トークン>"
 
 ローカルで試す場合は `.env` に `NEXT_PUBLIC_CF_BEACON_TOKEN` を入れる。
 
+## 長文リスニング（TOEIC Part 3 / 4 形式）
+
+音声を聞いて4択に答える。1音声につき3問。
+
+### 設計の根拠
+
+```
+Part 3 会話  = 13本 × 3問（2〜3人の話者）
+Part 4 説明文 = 10本 × 3問（1人）
+設問と選択肢は印刷されており、音声を聞きながら読める
+```
+
+第1章は6セット18問（会話3・説明文3、音声 28〜43秒）。
+
+### 会話の音声
+
+会話は**話者ごとに別のボイスで合成し、ffmpeg で結合する**（`scripts/generate-listening-audio.mjs`）。
+発話の間に 0.45 秒の無音を挟む。1つのボイスで全部読ませると誰が話しているのかが
+音から分からず、Part 3 の「話者を追う」という要素が失われるため。
+
+```bash
+npm run listening:audio            # 未生成のものだけ作る
+npm run listening:audio -- --force # すべて作り直す
+```
+
+ffmpeg が必要（`brew install ffmpeg`）。無音は発話と同じ形式（mp3 44.1kHz 128kbps）で
+生成し、concat demuxer で再エンコードなしに連結している。
+
+### 本番との違い
+
+本番は一度きりだが、**本アプリは繰り返し再生を許す**。練習では聞き直しが要るため。
+再生回数を表示するので、何回で取れたかは自分で分かる。速度調整も使える。
+
+### 台本の扱い
+
+台本は**採点後にのみ表示する**。先に見せたら聞き取りの練習にならない。
+結果画面では台本（英日併記）と再生ボタンを並べ、台本を読みながら聞き直せるようにしてある。
+設問と選択肢は最初から見える（本番でも印刷されている）。
+
 ## 長文読解（TOEIC Part 7 形式）
 
 速読の訓練。本文を読み、4択に答え、かかった時間からランクを出す。**制限時間は設けない。**
@@ -196,8 +235,8 @@ Part 7 = 54問 / 54分  →  1問あたり60秒が基準ペース
 「第5問から続ける」のようにどこへ入るのかを表示する。
 
 進捗は `localStorage` に置く（`lib/progress.ts`）。ディクテーションは
-`dictation-progress-v1` に問題ごとの点数を、長文読解は `reading-progress-v1` に
-セットごとの正答率を持つ。長文読解も一覧の升目に前回の正答率が出る。端末ごとの
+`dictation-progress-v1` に問題ごとの点数を、長文読解は `reading-progress-v1` に、
+長文リスニングは `listening-progress-v1` にセットごとの正答率を持つ。長文読解も一覧の升目に前回の正答率が出る。端末ごとの
 控えであって同期はしない。プライベートウィンドウなどでアクセス自体が例外を投げることが
 あるため、読み書きは必ず try/catch で包んである。保存できなくても学習は続けられる。
 
@@ -219,6 +258,7 @@ Part 7 = 54問 / 54分  →  1問あたり60秒が基準ペース
 ```
 content/questions.ts        ディクテーションの原本。アプリからは import しない
 content/reading.ts          長文読解の原本。同上
+content/listening.ts        長文リスニングの原本。同上
 lib/
   grade.ts                  ディクテーションの採点エンジン
   progress.ts               進捗の保存（localStorage）
@@ -226,16 +266,20 @@ lib/
   crypto.ts                 正解データの難読化
 scripts/
   build-content.mjs         public/data/ の生成と漏洩検査
-  generate-audio.mjs        音声の事前生成
+  generate-audio.mjs        ディクテーション音声の事前生成
+  generate-listening-audio.mjs  リスニング音声の生成（話者ごとに合成して結合）
   tts.mjs                   ElevenLabs / OpenAI 呼び出し（ビルド時専用）
   grade-test.mjs            採点エンジンの総当たりテスト
 public/
-  audio/{id}.mp3            事前生成した問題音声（コミット対象）
+  audio/{id}.mp3            ディクテーションの音声（コミット対象）
+  listening/{id}.mp3        リスニングの音声（コミット対象）
   data/                     生成物。コミットしない
   sw.js                     オフライン配信
 app/
   page.tsx                  モード切替・章選択・出題・結果
+  PlayControls.tsx          再生の操作（ディクテーションとリスニングで共有）
   Reading.tsx               長文読解の画面
+  Listening.tsx             長文リスニングの画面
 test/grading-report.md      採点テストの結果（自動生成）
 DESIGN.md                   デザイントークンと UI 方針
 ```

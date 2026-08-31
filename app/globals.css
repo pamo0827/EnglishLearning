@@ -530,3 +530,42 @@ textarea:focus {
   color: var(--color-danger);
   box-shadow: inset 0 0 0 1px var(--color-danger);
 }
+
+/* --- リスニングの台本。採点後にのみ出す --- */
+.script {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--color-surface-sunken);
+  border-radius: var(--rounded-md);
+}
+.script-line .label {
+  margin-bottom: 2px;
+}
+.script-en {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.85;
+}
+.script-ja {
+  margin: 2px 0 0;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--color-on-surface-muted);
+}
+
+/* モードが3つになるので、狭い画面では横スクロールさせる */
+@media (max-width: 560px) {
+  .modes {
+    display: flex;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mode-btn {
+    flex: 0 0 auto;
+    padding: 7px var(--space-md);
+    font-size: 13px;
+  }
+}

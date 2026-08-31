@@ -10,7 +10,8 @@
     "check:tts": "node scripts/check-tts.mjs",
     "audio:generate": "node scripts/generate-audio.mjs",
     "content:build": "node scripts/build-content.mjs",
-    "grade:test": "node scripts/grade-test.mjs"
+    "grade:test": "node scripts/grade-test.mjs",
+    "listening:audio": "node scripts/generate-listening-audio.mjs"
   },
   "dependencies": {
     "next": "15.5.4",

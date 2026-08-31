@@ -23,6 +23,9 @@ const { CHAPTERS, QUESTIONS } = await import("../content/questions.ts");
 const { READING_CHAPTERS, READING_SETS, SPEED_RANKS } = await import(
   "../content/reading.ts"
 );
+const { LISTENING_CHAPTERS, LISTENING_SETS } = await import(
+  "../content/listening.ts"
+);
 const { seal } = await import("../lib/crypto.ts");
 
 async function hasAudio(id) {
@@ -207,3 +210,109 @@ for (const c of readingChapters) {
   console.log(`  ${c.title}  ${c.setCount}セット ${c.questionCount}問`);
 }
 console.log("解説の漏洩チェック: OK");
+
+/* ------------------------------------------------------------------ *
+ * 長文リスニング
+ *
+ * 音声・設問文・選択肢は公開する（本番でも設問は印刷されている）。
+ * 隠すのは台本・正解・解説。台本を先に見せたら聞き取りの練習にならない。
+ * ------------------------------------------------------------------ */
+
+const LISTENING_ENC_DIR = path.join(DATA_DIR, "listening-enc");
+const LISTENING_AUDIO_DIR = path.join(ROOT, "public", "listening");
+await fs.rm(LISTENING_ENC_DIR, { recursive: true, force: true });
+await fs.mkdir(LISTENING_ENC_DIR, { recursive: true });
+
+const listeningSets = [];
+for (const set of LISTENING_SETS) {
+  let hasAudio = false;
+  try {
+    const stat = await fs.stat(path.join(LISTENING_AUDIO_DIR, `${set.id}.mp3`));
+    hasAudio = stat.size > 0;
+  } catch {
+    hasAudio = false;
+  }
+
+  listeningSets.push({
+    id: set.id,
+    chapter: set.chapter,
+    part: set.part,
+    scene: set.scene,
+    title: set.title,
+    speakerCount: new Set(set.lines.map((l) => l.speaker)).size,
+    questions: set.questions.map((q) => ({ stem: q.stem, choices: q.choices })),
+    audio: hasAudio,
+  });
+
+  const sealed = await seal(`listening:${set.id}`, {
+    lines: set.lines.map((l) => ({ speaker: l.speaker, text: l.text, ja: l.ja })),
+    questions: set.questions.map((q) => ({
+      answer: q.answer,
+      type: q.type,
+      evidence: q.evidence,
+      why: q.why,
+      choiceNotes: q.choiceNotes,
+    })),
+  });
+  await fs.writeFile(
+    path.join(LISTENING_ENC_DIR, `${set.id}.json`),
+    JSON.stringify(sealed)
+  );
+}
+
+const listeningChapters = LISTENING_CHAPTERS.map((c) => {
+  const inChapter = listeningSets.filter((s) => s.chapter === c.id);
+  return {
+    id: c.id,
+    title: c.title,
+    setCount: inChapter.length,
+    questionCount: inChapter.reduce((n, s) => n + s.questions.length, 0),
+    ready: inChapter.length > 0 && inChapter.every((s) => s.audio),
+  };
+});
+
+await fs.writeFile(
+  path.join(DATA_DIR, "listening.json"),
+  JSON.stringify({ chapters: listeningChapters, sets: listeningSets }, null, 2)
+);
+
+// 台本と解説が公開データへ出ていないことを検査する
+const listeningText = await fs.readFile(
+  path.join(DATA_DIR, "listening.json"),
+  "utf8"
+);
+const listeningLeaks = [];
+for (const set of LISTENING_SETS) {
+  for (const line of set.lines) {
+    if (listeningText.includes(line.text.slice(0, 24))) {
+      listeningLeaks.push(`set${set.id} 台本(英語)`);
+    }
+    for (const run of japaneseRuns(line.ja)) {
+      if (listeningText.includes(run)) listeningLeaks.push(`set${set.id} 台本(訳)`);
+    }
+  }
+  for (const [i, q] of set.questions.entries()) {
+    for (const run of japaneseRuns(q.why + " " + q.choiceNotes.join(" "))) {
+      if (listeningText.includes(run)) {
+        listeningLeaks.push(`set${set.id} Q${i + 1} 解説: ${run}`);
+      }
+    }
+  }
+}
+if (listeningLeaks.length > 0) {
+  console.error(`台本か解説が listening.json へ漏れています: ${listeningLeaks.join(", ")}`);
+  process.exit(1);
+}
+
+console.log(
+  `\n長文リスニング: 章 ${listeningChapters.length} / セット ${listeningSets.length} / 設問 ${listeningSets.reduce((n, s) => n + s.questions.length, 0)}`
+);
+for (const c of listeningChapters) {
+  const missing = listeningSets.filter((s) => s.chapter === c.id && !s.audio);
+  console.log(
+    `  ${c.title}  ${c.setCount}セット ${c.questionCount}問  ${
+      c.ready ? "音声そろい" : `音声未生成 ${missing.length}セット`
+    }`
+  );
+}
+console.log("台本・解説の漏洩チェック: OK");

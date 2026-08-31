@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { grade, type GradeResult } from "@/lib/grade";
 import { unseal, type Sealed } from "@/lib/crypto";
 import { Reading } from "./Reading";
+import { Listening } from "./Listening";
+import { PlayControls, RATES } from "./PlayControls";
 import {
   loadProgress,
   saveProgress,
@@ -40,13 +42,6 @@ type Answer = {
   hints: { phrase: string; note: string }[];
 };
 
-/** 再生速度。音の高さは変えずに速さだけを変える（preservesPitch の既定は true） */
-const RATES = [
-  { value: 0.75, label: "×0.75" },
-  { value: 0.9, label: "×0.9" },
-  { value: 1, label: "等速" },
-];
-
 const chapterCacheName = (id: number) => `chapter-${id}-v1`;
 
 function chapterUrls(index: Index, chapterId: number): string[] {
@@ -61,7 +56,7 @@ async function fetchAnswer(id: number): Promise<Answer> {
   return unseal<Answer>(id, (await res.json()) as Sealed);
 }
 
-type Mode = "dictation" | "reading";
+type Mode = "dictation" | "reading" | "listening";
 
 export default function Page() {
   const [mode, setMode] = useState<Mode>("dictation");
@@ -206,6 +201,13 @@ export default function Page() {
             ディクテーション
           </button>
           <button
+            className={`mode-btn${mode === "listening" ? " is-active" : ""}`}
+            onClick={() => setMode("listening")}
+            aria-pressed={mode === "listening"}
+          >
+            リスニング
+          </button>
+          <button
             className={`mode-btn${mode === "reading" ? " is-active" : ""}`}
             onClick={() => setMode("reading")}
             aria-pressed={mode === "reading"}
@@ -217,6 +219,8 @@ export default function Page() {
 
       {mode === "reading" ? (
         <Reading />
+      ) : mode === "listening" ? (
+        <Listening />
       ) : (
         <>
       {currentId !== undefined && !finished && (
@@ -512,67 +516,6 @@ function ChapterCard({
 
       {note && <p className="error">{note}</p>}
     </section>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * 再生の操作。出題画面と結果画面で共有する
- * ------------------------------------------------------------------ */
-
-function PlayControls({
-  playing,
-  plays,
-  rate,
-  onRate,
-  onPlay,
-  disabled,
-  showCount,
-}: {
-  playing: boolean;
-  plays: number;
-  rate: number;
-  onRate: (v: number) => void;
-  onPlay: () => void;
-  disabled?: boolean;
-  showCount?: boolean;
-}) {
-  return (
-    <>
-      <div className="play-row">
-        <button className="btn-primary btn-play" onClick={onPlay} disabled={disabled}>
-          {playing ? (
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <rect x="6" y="5" width="4" height="14" rx="1" />
-              <rect x="14" y="5" width="4" height="14" rx="1" />
-            </svg>
-          ) : (
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M8 5.5v13a1 1 0 0 0 1.5.87l11-6.5a1 1 0 0 0 0-1.74l-11-6.5A1 1 0 0 0 8 5.5Z" />
-            </svg>
-          )}
-          {playing ? "再生中" : plays === 0 ? "再生する" : "もう一回再生する"}
-        </button>
-      </div>
-
-      {showCount && <div className="label">再生回数 {plays}</div>}
-
-      {/* 再生ボタンとは別の行に置く。どちらも inline-flex なので、
-          包まないと横に並んでしまう。 */}
-      <div>
-        <div className="speed" role="group" aria-label="再生速度">
-          {RATES.map((r) => (
-            <button
-              key={r.value}
-              className={`speed-btn${r.value === rate ? " is-active" : ""}`}
-              onClick={() => onRate(r.value)}
-              aria-pressed={r.value === rate}
-            >
-              {r.label}
-            </button>
-          ))}
-        </div>
-      </div>
-    </>
   );
 }
 

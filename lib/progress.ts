@@ -9,6 +9,7 @@
 /** 保存先のキー。モードごとに分ける */
 export const DICTATION_KEY = "dictation-progress-v1";
 export const READING_KEY = "reading-progress-v1";
+export const LISTENING_KEY = "listening-progress-v1";
 
 /** 問題（またはセット）id → 直近のスコア（0〜100） */
 export type Progress = Record<number, number>;
