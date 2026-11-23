@@ -21,14 +21,12 @@ const PREFS_KEY = "lessons-prefs-v1";
 type Prefs = {
   lesson: number;
   track: string;
-  showEn: boolean;
   showJa: boolean;
 };
 
 const DEFAULT_PREFS: Prefs = {
   lesson: 1,
   track: "",
-  showEn: true,
   showJa: false,
 };
 
@@ -45,6 +43,29 @@ function loadPrefs(): Prefs {
 function savePrefs(prefs: Prefs): void {
   try {
     localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+  } catch {
+    // 保存できなくても再生はできる
+  }
+}
+
+/** 音声ごとの、最後まで聞いた回数。この端末のブラウザに保存する */
+const PLAYS_KEY = "lessons-plays-v1";
+type Plays = Record<string, number>;
+/** 早送りで終わりまで飛ばしただけのものは数えない。実際に鳴らした時間がこの割合を超えたら 1 回 */
+const COUNT_RATIO = 0.6;
+
+function loadPlays(): Plays {
+  try {
+    const raw = localStorage.getItem(PLAYS_KEY);
+    return raw ? (JSON.parse(raw) as Plays) : {};
+  } catch {
+    return {};
+  }
+}
+
+function savePlays(plays: Plays): void {
+  try {
+    localStorage.setItem(PLAYS_KEY, JSON.stringify(plays));
   } catch {
     // 保存できなくても再生はできる
   }
@@ -73,6 +94,11 @@ export function Lessons({ lessonKey }: { lessonKey: CryptoKey }) {
   const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [plays, setPlays] = useState<Plays>({});
+
+  /** いまの音声を実際に鳴らした秒数と、直前に見た再生位置 */
+  const listened = useRef(0);
+  const lastTime = useRef(0);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   /** 復号済みの音声。同じ音源を聞き直すたびに取り直さない */
@@ -91,8 +117,18 @@ export function Lessons({ lessonKey }: { lessonKey: CryptoKey }) {
 
   useEffect(() => {
     setPrefs(loadPrefs());
+    setPlays(loadPlays());
     loadManifest(lessonKey)
-      .then(setManifest)
+      .then((m) =>
+        // 音読用の音声は Part 1 と同じ文なので、一覧には出さない
+        setManifest({
+          ...m,
+          lessons: m.lessons.map((l) => ({
+            ...l,
+            tracks: l.tracks.filter((t) => !t.id.endsWith("-r")),
+          })),
+        })
+      )
       .catch(() => setError("教材のデータを読み込めませんでした。"));
   }, [lessonKey]);
 
@@ -136,6 +172,8 @@ export function Lessons({ lessonKey }: { lessonKey: CryptoKey }) {
     if (!trackId) return;
     let stale = false;
     setSrc(null);
+    listened.current = 0;
+    lastTime.current = 0;
     setTime(0);
     setDuration(0);
     setError(null);
@@ -225,7 +263,7 @@ export function Lessons({ lessonKey }: { lessonKey: CryptoKey }) {
   const selectLesson = (no: number) => {
     const l = manifest?.lessons.find((x) => x.no === no);
     if (!l) return;
-    // 同じ種類の音声（本文 / 音読用）を選んだままレッスンだけ替える
+    // 同じ Part を選んだままレッスンだけ替える。無ければ Part 1
     const same = l.tracks.find((t) => t.label === track?.label);
     select(no, (same ?? l.tracks[0]).id, playing);
   };
@@ -252,6 +290,14 @@ export function Lessons({ lessonKey }: { lessonKey: CryptoKey }) {
   const onEnded = () => {
     const el = audioRef.current;
     if (!el || !track) return;
+    if (listened.current >= (el.duration || track.duration) * COUNT_RATIO) {
+      // 保存済みの値に足す。別のタブで聞いた分を消さない
+      const next = loadPlays();
+      next[track.id] = (next[track.id] ?? 0) + 1;
+      savePlays(next);
+      setPlays(next);
+    }
+    listened.current = 0;
     // 終わったら次の音声へ続けて再生する。最後まで行ったら止まる
     const at = playlist.findIndex((p) => p.track.id === track.id);
     const upcoming = playlist[at + 1];
@@ -369,7 +415,13 @@ export function Lessons({ lessonKey }: { lessonKey: CryptoKey }) {
           if (!e.currentTarget.ended) setPlaying(false);
         }}
         onTimeUpdate={(e) => {
-          if (e.currentTarget.paused) setTime(e.currentTarget.currentTime);
+          const now = e.currentTarget.currentTime;
+          // 聞いた時間を足す。画面を消していても届くので、描画ごとの処理とは別に数える。
+          // 飛ばした分（10秒送りなど）は差が大きいので入らない
+          const d = now - lastTime.current;
+          if (!e.currentTarget.paused && d > 0 && d < 3) listened.current += d;
+          lastTime.current = now;
+          if (e.currentTarget.paused) setTime(now);
         }}
         onEnded={onEnded}
         onError={() => {
@@ -399,35 +451,35 @@ export function Lessons({ lessonKey }: { lessonKey: CryptoKey }) {
           <span className="question-no">Lesson {lesson.no}</span>
           <span className="lesson-title">{lesson.title}</span>
         </div>
+        {/* いま選んでいる音声を最後まで聞いた回数 */}
+        <div className="plays">
+          聞いた回数 <strong>{plays[track.id] ?? 0}</strong>回
+        </div>
         <div className="track-row">
-          <div className="speed" role="group" aria-label="音声">
-            {lesson.tracks.map((t) => (
-              <button
-                key={t.id}
-                className={`track-btn${t.id === track.id ? " is-active" : ""}`}
-                onClick={() => select(lesson.no, t.id, playing)}
-                aria-pressed={t.id === track.id}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-          <div className="speed" role="group" aria-label="原稿の表示">
-            <button
-              className={`track-btn${prefs.showEn ? " is-active" : ""}`}
-              onClick={() => update({ showEn: !prefs.showEn })}
-              aria-pressed={prefs.showEn}
-            >
-              英文
-            </button>
-            <button
-              className={`track-btn${prefs.showJa ? " is-active" : ""}`}
-              onClick={() => update({ showJa: !prefs.showJa })}
-              aria-pressed={prefs.showJa}
-            >
-              日本語訳
-            </button>
-          </div>
+          {/* 音声が1つだけのレッスンでは選ぶものが無いので出さない */}
+          {lesson.tracks.length > 1 && (
+            <div className="speed" role="group" aria-label="音声">
+              {lesson.tracks.map((t) => (
+                <button
+                  key={t.id}
+                  className={`track-btn${t.id === track.id ? " is-active" : ""}`}
+                  onClick={() => select(lesson.no, t.id, playing)}
+                  aria-pressed={t.id === track.id}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          )}
+          {/* 英文はいつも出す。切り替えるのは日本語訳だけ。
+              押すと何が起きるかをラベルに書く */}
+          <button
+            className="ja-toggle"
+            onClick={() => update({ showJa: !prefs.showJa })}
+            aria-pressed={prefs.showJa}
+          >
+            {prefs.showJa ? "日本語訳を隠す" : "日本語訳を出す"}
+          </button>
         </div>
       </section>
 
@@ -447,11 +499,7 @@ export function Lessons({ lessonKey }: { lessonKey: CryptoKey }) {
             >
               <span className="line-no">{numbered ? (s.no ?? "") : i + 1}</span>
               <span className="line-body">
-                {prefs.showEn ? (
-                  <span className="line-en">{s.en}</span>
-                ) : (
-                  !prefs.showJa && <span className="line-hidden">{clock(s.t)}</span>
-                )}
+                <span className="line-en">{s.en}</span>
                 {prefs.showJa && <span className="line-ja">{s.ja}</span>}
               </span>
             </button>

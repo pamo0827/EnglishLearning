@@ -36,16 +36,19 @@ jobs:
       - name: Build content
         run: npm run content:build
 
+      # 公開先のパスを GitHub Pages の設定から受け取る。独自ドメインなら空、
+      # https://<user>.github.io/<repo>/ なら /<repo> になる
+      - id: pages
+        uses: actions/configure-pages@v5
+
       - name: Build site
         run: npm run build
         env:
-          # プロジェクトページは https://<user>.github.io/<repo>/ に置かれる
-          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+          NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
           # Cloudflare Web Analytics。リポジトリの Variables に CF_BEACON_TOKEN を
           # 設定すると計測が有効になる（未設定なら何も読み込まない）
           NEXT_PUBLIC_CF_BEACON_TOKEN: ${{ vars.CF_BEACON_TOKEN }}
 
-      - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./out

@@ -13,4 +13,4 @@ workers_dev = true
 preview_urls = false
 
 [vars]
-ALLOWED_ORIGINS = "https://pamo0827.github.io,http://localhost:3000"
+ALLOWED_ORIGINS = "https://englishlearning.yoshikatsu.dev,https://pamo0827.github.io,http://localhost:3000"
