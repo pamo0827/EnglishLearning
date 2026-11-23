@@ -22,19 +22,28 @@ type Prefs = {
   lesson: number;
   track: string;
   showJa: boolean;
+  /** 選んだレッスンをくり返すか。picked を番号順に聞いたら頭に戻る */
+  repeat: boolean;
+  picked: number[];
 };
 
 const DEFAULT_PREFS: Prefs = {
   lesson: 1,
   track: "",
   showJa: false,
+  repeat: false,
+  picked: [],
 };
 
 function loadPrefs(): Prefs {
   try {
     const raw = localStorage.getItem(PREFS_KEY);
     if (!raw) return DEFAULT_PREFS;
-    return { ...DEFAULT_PREFS, ...(JSON.parse(raw) as Partial<Prefs>) };
+    const prefs = { ...DEFAULT_PREFS, ...(JSON.parse(raw) as Partial<Prefs>) };
+    // 選んだレッスンが無いのにくり返しだけ入っている状態は作らない
+    if (!Array.isArray(prefs.picked)) prefs.picked = [];
+    if (prefs.picked.length === 0) prefs.repeat = false;
+    return prefs;
   } catch {
     return DEFAULT_PREFS;
   }
@@ -268,6 +277,36 @@ export function Lessons({ lessonKey }: { lessonKey: CryptoKey }) {
     select(no, (same ?? l.tracks[0]).id, playing);
   };
 
+  /** くり返しの入り切り。入れるときは、いま開いているレッスンを必ず含める */
+  const toggleRepeat = () => {
+    if (prefs.repeat || !lesson) {
+      update({ repeat: false });
+      return;
+    }
+    const picked = prefs.picked.includes(lesson.no)
+      ? prefs.picked
+      : [...prefs.picked, lesson.no].sort((a, b) => a - b);
+    update({ repeat: true, picked });
+  };
+
+  /** くり返しの間は、升目を押すとそのレッスンを足したり外したりする */
+  const togglePicked = (no: number) => {
+    if (!lesson) return;
+    if (!prefs.picked.includes(no)) {
+      update({ picked: [...prefs.picked, no].sort((a, b) => a - b) });
+      return;
+    }
+    const rest = prefs.picked.filter((n) => n !== no);
+    if (rest.length === 0) return; // 最後の1つは外せない
+    update({ picked: rest });
+    if (no === lesson.no) {
+      // 開いているレッスンを外したら、残りのうち次のレッスンへ移る
+      const nextNo = rest.find((n) => n > no) ?? rest[0];
+      const l = manifest?.lessons.find((x) => x.no === nextNo);
+      if (l) select(l.no, l.tracks[0].id, playing);
+    }
+  };
+
   /* ---------------- 再生の進行 ---------------- */
 
   // timeupdate は 1 秒に 4 回ほどしか来ない。原稿の追従が遅れて見えるので、
@@ -298,9 +337,19 @@ export function Lessons({ lessonKey }: { lessonKey: CryptoKey }) {
       setPlays(next);
     }
     listened.current = 0;
-    // 終わったら次の音声へ続けて再生する。最後まで行ったら止まる
-    const at = playlist.findIndex((p) => p.track.id === track.id);
-    const upcoming = playlist[at + 1];
+    // 終わったら次の音声へ続けて再生する。最後まで行ったら止まる。
+    // くり返しのときは選んだレッスンだけを回り、最後まで行ったら頭に戻る
+    const list = prefs.repeat
+      ? playlist.filter((p) => prefs.picked.includes(p.lesson))
+      : playlist;
+    const at = list.findIndex((p) => p.track.id === track.id);
+    const upcoming = list[at + 1] ?? (prefs.repeat ? list[0] : undefined);
+    if (upcoming && upcoming.track.id === track.id) {
+      // 選んだ中に音声が1つしか無い。同じ音声なので差し替えは起きない。頭から鳴らし直す
+      el.currentTime = 0;
+      void el.play().catch(() => setPlaying(false));
+      return;
+    }
     if (upcoming) {
       select(upcoming.lesson, upcoming.track.id, true);
       return;
@@ -430,14 +479,39 @@ export function Lessons({ lessonKey }: { lessonKey: CryptoKey }) {
       />
 
       <section className="stack-sm">
-        <div className="label">レッスン</div>
+        <div className="lesson-head">
+          <div className="label">レッスン</div>
+          <button
+            className={`repeat-btn${prefs.repeat ? " is-active" : ""}`}
+            onClick={toggleRepeat}
+            aria-pressed={prefs.repeat}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M17 2l4 4-4 4" />
+              <path d="M3 11v-1a4 4 0 0 1 4-4h14" />
+              <path d="M7 22l-4-4 4-4" />
+              <path d="M21 13v1a4 4 0 0 1-4 4H3" />
+            </svg>
+            くり返し
+          </button>
+        </div>
         <div className="lesson-grid" role="group" aria-label="レッスン">
           {manifest.lessons.map((l) => (
             <button
               key={l.no}
-              className={`lesson-cell${l.no === lesson.no ? " is-active" : ""}`}
-              onClick={() => selectLesson(l.no)}
-              aria-pressed={l.no === lesson.no}
+              className={`lesson-cell${l.no === lesson.no ? " is-active" : ""}${
+                prefs.repeat && prefs.picked.includes(l.no) ? " is-picked" : ""
+              }`}
+              onClick={() => (prefs.repeat ? togglePicked(l.no) : selectLesson(l.no))}
+              aria-pressed={prefs.repeat ? prefs.picked.includes(l.no) : l.no === lesson.no}
               aria-label={`レッスン${l.no}`}
             >
               {l.no}

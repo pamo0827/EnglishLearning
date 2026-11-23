@@ -645,8 +645,8 @@ textarea:focus {
   align-items: baseline;
   gap: var(--space-md);
   width: 100%;
-  min-height: 44px;
-  padding: var(--space-sm);
+  /* 文と文を詰めて、一度に見える量を増やす。上下の余白は小さくする */
+  padding: 3px var(--space-sm);
   background: transparent;
   color: var(--color-on-surface);
   border-radius: var(--rounded-md);
@@ -663,7 +663,7 @@ textarea:focus {
   flex: 0 0 26px;
   font-size: 18px;
   font-weight: 700;
-  line-height: 1.7;
+  line-height: 1.5;
   color: var(--color-on-surface);
   font-variant-numeric: tabular-nums;
   text-align: right;
@@ -676,7 +676,7 @@ textarea:focus {
 }
 .line-en {
   font-size: 18px;
-  line-height: 1.7;
+  line-height: 1.5;
 }
 .line.is-active .line-en {
   font-weight: 600;
@@ -819,7 +819,7 @@ textarea:focus {
 }
 /* 番号つきの短文は、番号の変わり目を余白で区切る */
 .lines li.is-item-start {
-  margin-top: var(--space-md);
+  margin-top: 10px;
 }
 
 /* --- 教材音声のログイン --- */
@@ -858,4 +858,42 @@ textarea:focus {
   font-size: 18px;
   color: var(--color-on-surface);
   font-variant-numeric: tabular-nums;
+}
+
+/* --- 教材音声のくり返し（レッスンを選ぶ） --- */
+.lesson-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+.repeat-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 28px;
+  padding: 0 10px 0 8px;
+  background: var(--color-surface-sunken);
+  color: var(--color-on-surface-muted);
+  border-radius: var(--rounded-full);
+  font-size: 12px;
+  font-weight: 600;
+}
+.repeat-btn svg {
+  width: 14px;
+  height: 14px;
+}
+.repeat-btn.is-active {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+/* くり返しに選んだレッスンは枠で示す。いま開いているレッスンは塗りのまま */
+.lesson-cell.is-picked {
+  box-shadow: inset 0 0 0 2px var(--color-primary);
+  background: var(--color-surface);
+  color: var(--color-primary);
+}
+.lesson-cell.is-picked.is-active {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
 }
