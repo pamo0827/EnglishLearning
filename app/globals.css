@@ -831,22 +831,55 @@ textarea:focus {
   font-size: 15px;
   font-weight: 600;
 }
-.login-input {
-  display: block;
-  width: 100%;
-  min-height: 48px;
-  padding: 0 var(--space-md);
+/* パスワードの 4 つの枠。上に透明な入力欄を 1 つ重ねてある */
+.code {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 56px);
+  gap: var(--space-sm);
+  width: max-content;
+}
+.code-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
   border: 1px solid var(--color-on-surface-muted);
   border-radius: var(--rounded-sm);
   background: var(--color-surface);
   color: var(--color-on-surface);
-  font-family: inherit;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1;
+}
+/* 次に文字が入る枠 */
+.code-box.is-current {
+  border-color: var(--color-primary);
+  box-shadow: inset 0 0 0 1px var(--color-primary);
+}
+.code-box.is-error {
+  border-color: var(--color-danger);
+}
+.code-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  /* 文字も、変換中に付く下線や色の帯も見せない。見せるのは下の 4 つの枠だけ */
+  opacity: 0;
+  outline: none;
   /* iOS は 16px 未満の入力欄に触れると画面を拡大する */
   font-size: 16px;
 }
-.login-input:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 1px;
+.login-help {
+  margin: var(--space-sm) 0 0;
+  font-size: 14px;
+  color: var(--color-on-surface-muted);
+}
+.login-help .error {
+  margin: 0;
 }
 
 /* --- 教材音声の聞いた回数 --- */

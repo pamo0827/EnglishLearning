@@ -60,6 +60,9 @@ async function fetchAnswer(id: number): Promise<Answer> {
 
 type Mode = "dictation" | "reading" | "listening" | "lessons";
 
+/** リスニングのタブを出すか。中身（app/Listening.tsx とデータ）は残してある */
+const SHOW_LISTENING = false;
+
 export default function Page() {
   const [mode, setMode] = useState<Mode>("dictation");
   const [index, setIndex] = useState<Index | null>(null);
@@ -73,7 +76,7 @@ export default function Page() {
   const [progress, setProgress] = useState<Progress>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  /** 教材音声の鍵。許可した IP から開くか、パスワードでログインすると手に入る */
+  /** 教材音声の鍵。パスワードでログインすると手に入る */
   const [lessonKey, setLessonKey] = useState<CryptoKey | null>(null);
   const [lessonKeyChecked, setLessonKeyChecked] = useState(false);
 
@@ -209,13 +212,16 @@ export default function Page() {
           >
             ディクテーション
           </button>
-          <button
-            className={`mode-btn${mode === "listening" ? " is-active" : ""}`}
-            onClick={() => setMode("listening")}
-            aria-pressed={mode === "listening"}
-          >
-            リスニング
-          </button>
+          {/* リスニングは一旦隠している。戻すときは SHOW_LISTENING を true にする */}
+          {SHOW_LISTENING && (
+            <button
+              className={`mode-btn${mode === "listening" ? " is-active" : ""}`}
+              onClick={() => setMode("listening")}
+              aria-pressed={mode === "listening"}
+            >
+              リスニング
+            </button>
+          )}
           <button
             className={`mode-btn${mode === "reading" ? " is-active" : ""}`}
             onClick={() => setMode("reading")}
@@ -314,49 +320,126 @@ export default function Page() {
 }
 
 /* ------------------------------------------------------------------ *
- * 教材音声のログイン。許可した IP 以外から開いたときにだけ出る
+ * 教材音声のログイン。その端末で初めて開いたときに出る
  * ------------------------------------------------------------------ */
+
+/** パスワードの文字数。入力欄の数になる。パスワードの長さを変えたらここも変える */
+const PASSWORD_LENGTH = 4;
+const HIRAGANA = /^[\u3041-\u3096ー]+$/;
 
 function LessonLogin({ onLogin }: { onLogin: (key: CryptoKey) => void }) {
   const [password, setPassword] = useState("");
+  /** かな漢字変換の途中か。途中の文字（ローマ字など）は確定するまで判定しない */
+  const [composing, setComposing] = useState(false);
+  const [focused, setFocused] = useState(false);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password === "" || busy) return;
-    setBusy(true);
+  const chars = Array.from(password).slice(0, PASSWORD_LENGTH);
+  const complete = !composing && chars.length === PASSWORD_LENGTH;
+  /** 確定した文字にひらがな以外が混じっている（かな入力に切り替わっていない） */
+  const notKana = !composing && password !== "" && !HIRAGANA.test(password);
+
+  const login = useCallback(
+    async (value: string) => {
+      setBusy(true);
+      setFailed(false);
+      const key = await loginWithPassword(value);
+      setBusy(false);
+      if (key) {
+        onLogin(key);
+        return;
+      }
+      setFailed(true);
+      setPassword("");
+      inputRef.current?.focus();
+    },
+    [onLogin]
+  );
+
+  // 4文字そろったら、ボタンを押さなくても確かめに行く
+  useEffect(() => {
+    if (complete && HIRAGANA.test(password)) void login(password);
+  }, [complete, password, login]);
+
+  /** 入力欄は1つ。確定した文字は 4 文字までに切る（変換の途中では切らない） */
+  const accept = (value: string, stillComposing: boolean) => {
+    if (busy) return;
     setFailed(false);
-    const key = await loginWithPassword(password);
-    setBusy(false);
-    if (key) onLogin(key);
-    else setFailed(true);
+    setPassword(
+      stillComposing ? value : Array.from(value).slice(0, PASSWORD_LENGTH).join("")
+    );
   };
 
   return (
-    <form className="login stack-md" onSubmit={submit}>
-      <label className="stack-sm" style={{ display: "block" }}>
-        <span className="login-label">パスワード</span>
-        <input
-          className="login-input"
-          type="password"
-          autoComplete="current-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          aria-invalid={failed}
-          aria-describedby={failed ? "login-error" : undefined}
-        />
-      </label>
-      {failed && (
-        <p className="error" id="login-error" role="alert" style={{ margin: 0 }}>
-          ログインできませんでした。パスワードを確かめてください。
+    <form
+      className="login stack-md"
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (complete && !busy) void login(password);
+      }}
+    >
+      <div className="stack-sm">
+        <label className="login-label" htmlFor="login-code">
+          パスワード
+        </label>
+        {/* 見えている 4 つの枠は表示だけで、実際の入力欄は上に重ねた透明な 1 つ。
+            枠ごとに入力欄を分けると、かな漢字変換が枠をまたげず、ひらがなを打てない。
+            type は text にする。password だと日本語入力が使えない */}
+        <div className={`code${focused ? " is-focused" : ""}`}>
+          {Array.from({ length: PASSWORD_LENGTH }, (_, i) => (
+            <span
+              key={i}
+              className={`code-box${
+                focused && i === Math.min(chars.length, PASSWORD_LENGTH - 1) ? " is-current" : ""
+              }${failed ? " is-error" : ""}`}
+              aria-hidden="true"
+            >
+              {chars[i] ?? ""}
+            </span>
+          ))}
+          <input
+            id="login-code"
+            ref={inputRef}
+            className="code-input"
+            type="text"
+            lang="ja"
+            inputMode="text"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
+            enterKeyHint="go"
+            value={password}
+            disabled={busy}
+            onChange={(e) =>
+              accept(e.target.value, (e.nativeEvent as InputEvent).isComposing || composing)
+            }
+            onCompositionStart={() => setComposing(true)}
+            onCompositionEnd={(e) => {
+              setComposing(false);
+              accept(e.currentTarget.value, false);
+            }}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            aria-invalid={failed}
+            aria-describedby={busy || failed || notKana ? "login-help" : undefined}
+          />
+        </div>
+      </div>
+      {/* ふだんは何も出さない。確認中と、うまくいかなかったときだけ知らせる */}
+      {(busy || failed || notKana) && (
+        <p id="login-help" className="login-help" role={busy ? undefined : "alert"}>
+          {busy ? (
+            "確認中…"
+          ) : failed ? (
+            <span className="error">ログインできませんでした。パスワードを確かめてください。</span>
+          ) : (
+            <span className="error">ひらがなで入力してください。</span>
+          )}
         </p>
       )}
-      <div className="actions">
-        <button className="btn-primary" type="submit">
-          {busy ? "確認中…" : "ログインする"}
-        </button>
-      </div>
     </form>
   );
 }

@@ -2,10 +2,9 @@
  * 教材音声の鍵を配る。
  *
  * 音声と原稿は暗号化した状態で GitHub Pages に置いてある。鍵はここにしか無く、
- * 次のどちらかのときだけ返す。それ以外には 403 を返し、理由も中身も出さない。
- *   - 許可した IP から来た（GET）
- *   - 正しいパスワードを送ってきた（POST。本文は {"password": "..."}）
- * パスワードは secret の LESSON_PASSWORD。未設定ならパスワードでは入れない。
+ * 正しいパスワードを送ってきたときだけ返す（POST。本文は {"password": "..."}）。
+ * それ以外には 403 を返し、理由も中身も出さない。
+ * パスワードは secret の LESSON_PASSWORD。未設定なら誰も入れない。
  */
 
 /** 長さや一致位置が応答時間に出ないよう、ハッシュどうしを比べる */
@@ -22,43 +21,6 @@ async function samePassword(given, expected) {
   return diff === 0;
 }
 
-/** IPv6 を 8 つの 16bit 値に展開する。IPv4 や不正な文字列は null */
-function parseV6(text) {
-  if (!text.includes(":")) return null;
-  const [head, tail] = text.split("::");
-  if (text.split("::").length > 2) return null;
-  const h = head ? head.split(":") : [];
-  const t = tail !== undefined && tail !== "" ? tail.split(":") : [];
-  const fill = tail === undefined ? 0 : 8 - h.length - t.length;
-  if (fill < 0 || (tail === undefined && h.length !== 8)) return null;
-  const parts = [...h, ...new Array(fill).fill("0"), ...t].map((p) =>
-    parseInt(p, 16)
-  );
-  if (parts.length !== 8 || parts.some((n) => !(n >= 0 && n <= 0xffff))) {
-    return null;
-  }
-  return parts;
-}
-
-function matches(ip, rule) {
-  const [base, bitsText] = rule.split("/");
-  const a = parseV6(ip);
-  const b = parseV6(base);
-  if (a === null || b === null) {
-    // IPv4 は完全一致だけを見る
-    return bitsText === undefined && ip === base;
-  }
-  const bits = bitsText === undefined ? 128 : Number(bitsText);
-  if (!(bits >= 0 && bits <= 128)) return false;
-  for (let i = 0; i < 8; i++) {
-    const take = Math.min(16, Math.max(0, bits - i * 16));
-    if (take === 0) break;
-    const mask = (0xffff << (16 - take)) & 0xffff;
-    if ((a[i] & mask) !== (b[i] & mask)) return false;
-  }
-  return true;
-}
-
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") ?? "";
@@ -73,21 +35,14 @@ export default {
     }
 
     if (request.method === "OPTIONS") {
-      headers["Access-Control-Allow-Methods"] = "GET, POST";
+      headers["Access-Control-Allow-Methods"] = "POST";
       headers["Access-Control-Allow-Headers"] = "Content-Type";
       headers["Access-Control-Max-Age"] = "86400";
       return new Response(null, { status: 204, headers });
     }
 
     let ok = false;
-    if (request.method === "GET") {
-      const ip = request.headers.get("CF-Connecting-IP") ?? "";
-      const rules = (env.ALLOWED_IPS ?? "")
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-      ok = ip !== "" && rules.some((r) => matches(ip, r));
-    } else if (request.method === "POST") {
+    if (request.method === "POST") {
       let given = "";
       try {
         const body = await request.json();

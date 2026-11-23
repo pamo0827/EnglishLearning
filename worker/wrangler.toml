@@ -1,11 +1,8 @@
-# 教材音声の鍵を、許可した IP にだけ渡す Worker。
+# 教材音声の鍵を、パスワードと引き換えに渡す Worker。
 #
 #   cd worker && wrangler deploy
 #   wrangler secret put LESSON_KEY    # .env の LESSON_KEY と同じ値
-#   wrangler secret put ALLOWED_IPS   # カンマ区切り。IPv4 はそのまま、IPv6 は /64 などの範囲でも書ける
 #   wrangler secret put LESSON_PASSWORD   # 共有するパスワード（npm run lessons:password でも設定できる）
-#
-# 許可する IP そのものも公開したくないので、vars ではなく secret に置く。
 name = "english-learning-key"
 main = "src/index.js"
 compatibility_date = "2026-10-01"

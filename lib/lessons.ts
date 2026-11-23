@@ -3,8 +3,8 @@
  *
  * ほかのモードの lib/crypto.ts は「うっかり目に入らない」ための難読化で、鍵の材料が
  * バンドルに入っている。こちらは別物で、鍵はバンドルにもリポジトリにも無い。
- * 許可した IP から来たときか、正しいパスワードを送ったときだけ
- * Worker（worker/src/index.js）が鍵を返す。鍵が取れなければログインの欄を出す。
+ * 正しいパスワードを送ったときだけ Worker（worker/src/index.js）が鍵を返す。
+ * 鍵が取れなければログインの欄を出す。
  *
  * 鍵そのものは保存しない。端末に残すのはログインに使ったパスワードだけで、
  * Worker 側のパスワードを変えれば、次に開いたときから入れなくなる。
@@ -12,7 +12,7 @@
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-/** 鍵を配る Worker。URL 自体は秘密ではない（許可外の IP には 403 しか返さない） */
+/** 鍵を配る Worker。URL 自体は秘密ではない（パスワードが合わなければ 403 しか返さない） */
 const KEY_URL =
   process.env.NEXT_PUBLIC_LESSON_KEY_URL ??
   "https://english-learning-key.pamo0827.workers.dev/";
@@ -84,12 +84,11 @@ async function requestKey(password?: string): Promise<CryptoKey | null> {
 }
 
 /**
- * 起動時に呼ぶ。許可された IP ならそのまま鍵が返る。そうでなければ、前回ログインに
- * 使ったパスワードが端末に残っていればそれで試す。どちらも駄目なら null。
+ * 起動時に呼ぶ。前回ログインに使ったパスワードが端末に残っていれば、それで鍵を取る。
+ * 残っていなければ通信せずに null を返すので、初めて開いた端末ではすぐにログイン欄が出る。
+ * 回線（IP）だけで通すことはしない。どの端末でも最初の1回はパスワードを入れてもらう。
  */
 export async function fetchLessonKey(): Promise<CryptoKey | null> {
-  const byIp = await requestKey();
-  if (byIp) return byIp;
   let saved: string | null = null;
   try {
     saved = localStorage.getItem(PASSWORD_KEY);
