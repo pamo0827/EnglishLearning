@@ -148,6 +148,15 @@ export function Lessons({ lessonKey }: { lessonKey: CryptoKey }) {
     };
   }, []);
 
+  // この画面の間は、ページ全体ではなく body の中を送る形にする（globals.css の lessons-shell）。
+  // スマホのブラウザは、ページを送るとアドレスバーやツールバーを出し入れして画面の高さを
+  // 変える。その間、下端に固定した操作パネルが隠れることがある。
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.add("lessons-shell");
+    return () => root.classList.remove("lessons-shell");
+  }, []);
+
   /** レッスンをまたいで順に並べた全音声。「次へ続けて再生する」で使う */
   const playlist = useMemo(
     () =>

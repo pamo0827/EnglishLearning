@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 /**
@@ -11,6 +11,13 @@ const CF_BEACON_TOKEN = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN ?? "";
 export const metadata: Metadata = {
   title: "英語学習",
   description: "ディクテーションと長文読解。聞き取れなかった原因と、選択肢を切る根拠を確かめる練習",
+};
+
+/** 画面の端まで使う。下端の操作パネルがホームバーの余白（safe-area）を自分で空ける */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

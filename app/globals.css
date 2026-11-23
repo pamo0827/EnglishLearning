@@ -897,3 +897,18 @@ textarea:focus {
   background: var(--color-primary);
   color: var(--color-on-primary);
 }
+
+/* --- 教材音声の画面の送り方 --- */
+/* ページ全体は動かさず、body の中だけを送る。ブラウザのツールバーが出入りしなくなり、
+   下端の操作パネルがいつも見える */
+html.lessons-shell {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+html.lessons-shell body {
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
