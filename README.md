@@ -128,6 +128,65 @@ gh variable set CF_BEACON_TOKEN --body "<トークン>"
 
 ローカルで試す場合は `.env` に `NEXT_PUBLIC_CF_BEACON_TOKEN` を入れる。
 
+## 教材音声（許可した IP かパスワードで使える）
+
+市販教材の音源を、原稿を追いながら何度も聞くためのモード。レッスンと音声を選び、
+文を押すとその文の頭から鳴る。10秒戻る・進む、前の文・次の文、日本語訳の表示を備える。
+音声が終わると、次の音声へ続けて再生する。
+
+キーボードでも操作できる（スペース: 再生と停止、←→: 10秒、↑↓: 前後の文）。
+
+### 制限のしくみ
+
+このリポジトリも配信先も公開なので、音源と原稿は**暗号化したものだけ**を置く。
+
+```
+private/lessons/            原本（音源・原稿・訳）。コミットしない
+public/lessons/*.bin        AES-256-GCM で暗号化したもの。コミットする
+worker/                     鍵を渡す Cloudflare Worker
+```
+
+鍵はリポジトリにもバンドルにも無く、Worker の secret にだけある。Worker が鍵を返すのは、
+許可した IP から来たときと、正しいパスワードを送ってきたときだけ。画面は起動時に鍵を
+取りに行き、取れなければパスワードの欄を出す。一度ログインした端末にはパスワードを
+残すので、次からは聞かれない。
+
+### パスワードを決める・変える
+
+```bash
+npm run lessons:password    # 入力を求められるので、共有するパスワードを打つ
+```
+
+すぐに反映される。変えると、前のパスワードでログインしていた端末は次に開いたときから
+入れなくなる。パスワードでのログインをやめるには `cd worker && wrangler secret delete LESSON_PASSWORD`。
+間違えると応答を1秒遅らせるが、回数の制限は無いので、短すぎるものは避けること。
+
+ほかのモードの `lib/crypto.ts` は鍵の材料がバンドルに入っている難読化で、これとは別物。
+
+### 許可する IP を変える
+
+回線の IP が変わって入口が出なくなったら、Worker の secret を入れ直す。再デプロイは要らない。
+
+```bash
+curl -4 https://api.ipify.org; echo     # 今の IPv4
+curl -6 https://api64.ipify.org; echo   # 今の IPv6（先頭4組が回線ごとの範囲）
+cd worker
+printf '203.0.113.5,2001:db8:1:2::/64' | wrangler secret put ALLOWED_IPS
+```
+
+IPv4 は完全一致、IPv6 は `/64` のように範囲で書ける。IPv6 が使える回線ではブラウザが
+IPv6 でつなぐので、両方を入れておくこと。
+
+### レッスンを追加する
+
+1. 音源を `private/lessons/audio/` に置く
+2. `private/lessons/lessons.json` に原稿・訳・文ごとの開始秒を書く
+3. `npm run lessons:build` で `public/lessons/` を作り直す（鍵は `.env` の `LESSON_KEY`）
+4. `public/lessons/` をコミットして push する
+
+`.env` を失くすと鍵が分からなくなる。そのときは `LESSON_KEY` を消して 3 をやり直し、
+新しい鍵を `wrangler secret put LESSON_KEY` で Worker にも入れる。
+
 ## 長文リスニング（TOEIC Part 3 / 4 形式）
 
 音声を聞いて4択に答える。1音声につき3問。
@@ -264,6 +323,7 @@ lib/
   progress.ts               進捗の保存（localStorage）
   reading.ts                長文読解の採点と速読ランク判定
   crypto.ts                 正解データの難読化
+  lessons.ts                教材音声の鍵の取得と復号
 scripts/
   build-content.mjs         public/data/ の生成と漏洩検査
   generate-audio.mjs        ディクテーション音声の事前生成
@@ -280,6 +340,8 @@ app/
   PlayControls.tsx          再生の操作（ディクテーションとリスニングで共有）
   Reading.tsx               長文読解の画面
   Listening.tsx             長文リスニングの画面
+  Lessons.tsx               教材音声の画面
+worker/                     教材音声の鍵を許可 IP にだけ渡す Cloudflare Worker
 test/grading-report.md      採点テストの結果（自動生成）
 DESIGN.md                   デザイントークンと UI 方針
 ```

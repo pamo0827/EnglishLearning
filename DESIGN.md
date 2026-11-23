@@ -110,6 +110,40 @@ components:
     backgroundColor: "{colors.secondary}"
     textColor: "{colors.on-secondary}"
     rounded: "{rounded.full}"
+  lesson-cell:
+    backgroundColor: "{colors.surface-sunken}"
+    textColor: "{colors.on-surface-muted}"
+    rounded: "{rounded.sm}"
+    height: "44px"
+  lesson-cell-active:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.on-primary}"
+    rounded: "{rounded.sm}"
+  transcript-line:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.on-surface}"
+    rounded: "{rounded.md}"
+    padding: "{spacing.sm}"
+  transcript-line-active:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.primary}"
+    rounded: "{rounded.md}"
+  player-bar:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.on-surface-muted}"
+    padding: "{spacing.md}"
+  player-button:
+    backgroundColor: "{colors.secondary}"
+    textColor: "{colors.on-secondary}"
+    rounded: "{rounded.md}"
+    typography: "{typography.label}"
+    height: "56px"
+  player-button-play:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.on-primary}"
+    rounded: "{rounded.md}"
+    typography: "{typography.label}"
+    height: "56px"
   word-ok:
     textColor: "{colors.success}"
   word-near:
@@ -316,6 +350,42 @@ components:
 主ボタンは未解答の最初の問題を指す。すでに何問か解いていれば「第5問から続ける」と、
 どこへ入るのかを文字で言う。
 
+## Components（教材音声）
+
+市販教材の音源を、原稿を目で追いながら何度も聞くためのモード。許可した IP から開くと
+そのまま使え、それ以外ではパスワードの欄が出る。一度ログインした端末では次から聞かれない。
+
+採点が無いので、ほかのモードの「答えを漏らさない」という規則はここには当てはまらない。
+原稿は最初から見せる。その代わりに守るのは**操作のしやすさ**で、次の3つを決まりにする。
+
+**再生の操作は画面の下端に固定する（`player-bar`）。** 原稿は長く、読み進めるほど
+画面が下へ送られる。操作が原稿の上にあると、聞き直すたびに画面を戻すことになる。
+固定するのはこのモードだけで、ほかのモードの再生ボタンは動かさない。
+
+**操作パネルに置くのは、再生位置と5つのボタンだけにする。** 前の文・10秒戻る・再生と
+停止・10秒進む・次の文。再生速度やくり返しの設定は置かない。聞き直しは「前の文」と
+「10秒戻る」で足り、設定を並べるとパネルが原稿を隠す。音声が終わったら、次の音声へ
+そのまま続けて再生する。
+
+**ボタンはアイコンの下に必ず文字を置く（`player-button`）。** 5つが横に並ぶので文字は
+`label` の大きさまで落とすが、消しはしない。「前の文」と「10秒戻る」はアイコンだけでは
+見分けられない。高さは 56px とし、44px のタップ領域を確実に超える。再生だけを
+`primary` にし、幅も他の1.5倍にする。
+
+**1文が1つのボタンになる（`transcript-line`）。** 押すとその文の頭から鳴る。**いま鳴って
+いる文は文字を `primary` の青にし、太字にする。地の色は変えない。** 地を塗ると、文が
+切り替わるたびに面が動いて目が疲れる。色だけに頼らないよう太字を併せる。
+鳴っている文が画面の外へ出たら原稿を自動で送るが、止めている間は送らない。
+
+短文の番号（1, 2, 3…）は本文と同じ 18px の太字で置く。どの番号を聞いているかは
+教材と見比べるときの手がかりなので、`label` の大きさでは小さすぎる。
+
+レッスンの番号は10個を並べる（`lesson-cell`）。選ぶのに一覧画面を挟まない。
+レッスンを替えても、音声の種類と日本語訳の表示は引き継ぐ。
+
+日本語訳は既定で隠す。訳が見えていると英文を読まなくなる。英文も隠せるようにし、
+両方を隠せば耳だけの練習になる。
+
 ## Do's and Don'ts
 
 - **Do** 出題画面の表示要素を、問題番号・再生ボタン・再生回数・再生速度・入力欄・採点ボタンの
@@ -340,5 +410,6 @@ components:
 - **Do** 同じ操作は画面をまたいで同じ部品・同じ見た目で出す。
 - **Don't** 経過時間に警告色を使わない。制限時間ではない。
 - **Don't** 未着手の状態に警告色を使わない。まだやっていないことは失敗ではない。
+- **Don't** 教材音声の音源や原稿を、暗号化せずに `public/` へ置かない。
 - **Do** 並ぶボタンが似た操作なら、動詞を揃えて目的語だけで区別する。
 - **Do** 主操作と副操作は行を分ける。副操作が複数あるときは見出しを付けてまとめる。

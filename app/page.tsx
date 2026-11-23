@@ -5,6 +5,8 @@ import { grade, type GradeResult } from "@/lib/grade";
 import { unseal, type Sealed } from "@/lib/crypto";
 import { Reading } from "./Reading";
 import { Listening } from "./Listening";
+import { Lessons } from "./Lessons";
+import { fetchLessonKey, loginWithPassword } from "@/lib/lessons";
 import { PlayControls, RATES } from "./PlayControls";
 import {
   loadProgress,
@@ -56,7 +58,7 @@ async function fetchAnswer(id: number): Promise<Answer> {
   return unseal<Answer>(id, (await res.json()) as Sealed);
 }
 
-type Mode = "dictation" | "reading" | "listening";
+type Mode = "dictation" | "reading" | "listening" | "lessons";
 
 export default function Page() {
   const [mode, setMode] = useState<Mode>("dictation");
@@ -71,11 +73,18 @@ export default function Page() {
   const [progress, setProgress] = useState<Progress>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** 教材音声の鍵。許可した IP から開くか、パスワードでログインすると手に入る */
+  const [lessonKey, setLessonKey] = useState<CryptoKey | null>(null);
+  const [lessonKeyChecked, setLessonKeyChecked] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     setProgress(loadProgress(DICTATION_KEY));
+    void fetchLessonKey().then((key) => {
+      setLessonKey(key);
+      setLessonKeyChecked(true);
+    });
   }, []);
 
   useEffect(() => {
@@ -214,10 +223,25 @@ export default function Page() {
           >
             長文読解
           </button>
+          <button
+            className={`mode-btn${mode === "lessons" ? " is-active" : ""}`}
+            onClick={() => setMode("lessons")}
+            aria-pressed={mode === "lessons"}
+          >
+            教材音声
+          </button>
         </div>
       </header>
 
-      {mode === "reading" ? (
+      {mode === "lessons" ? (
+        lessonKey ? (
+          <Lessons lessonKey={lessonKey} />
+        ) : lessonKeyChecked ? (
+          <LessonLogin onLogin={setLessonKey} />
+        ) : (
+          <p className="muted">読み込み中…</p>
+        )
+      ) : mode === "reading" ? (
         <Reading />
       ) : mode === "listening" ? (
         <Listening />
@@ -286,6 +310,54 @@ export default function Page() {
         </>
       )}
     </main>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * 教材音声のログイン。許可した IP 以外から開いたときにだけ出る
+ * ------------------------------------------------------------------ */
+
+function LessonLogin({ onLogin }: { onLogin: (key: CryptoKey) => void }) {
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === "" || busy) return;
+    setBusy(true);
+    setFailed(false);
+    const key = await loginWithPassword(password);
+    setBusy(false);
+    if (key) onLogin(key);
+    else setFailed(true);
+  };
+
+  return (
+    <form className="login stack-md" onSubmit={submit}>
+      <label className="stack-sm" style={{ display: "block" }}>
+        <span className="login-label">パスワード</span>
+        <input
+          className="login-input"
+          type="password"
+          autoComplete="current-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          aria-invalid={failed}
+          aria-describedby={failed ? "login-error" : undefined}
+        />
+      </label>
+      {failed && (
+        <p className="error" id="login-error" role="alert" style={{ margin: 0 }}>
+          ログインできませんでした。パスワードを確かめてください。
+        </p>
+      )}
+      <div className="actions">
+        <button className="btn-primary" type="submit">
+          {busy ? "確認中…" : "ログインする"}
+        </button>
+      </div>
+    </form>
   );
 }
 

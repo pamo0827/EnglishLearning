@@ -10,3 +10,8 @@ next-env.d.ts
 tts-sample.mp3
 out
 public/data
+
+# 教材音声の原本（市販教材の音源と原稿）。暗号化したものだけを public/lessons/ に置く
+private
+worker/.wrangler
+worker/node_modules

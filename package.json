@@ -11,7 +11,9 @@
     "audio:generate": "node scripts/generate-audio.mjs",
     "content:build": "node scripts/build-content.mjs",
     "grade:test": "node scripts/grade-test.mjs",
-    "listening:audio": "node scripts/generate-listening-audio.mjs"
+    "listening:audio": "node scripts/generate-listening-audio.mjs",
+    "lessons:build": "node scripts/build-lessons.mjs",
+    "lessons:password": "cd worker && wrangler secret put LESSON_PASSWORD"
   },
   "dependencies": {
     "next": "15.5.4",

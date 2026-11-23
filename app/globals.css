@@ -565,7 +565,280 @@ textarea:focus {
   }
   .mode-btn {
     flex: 0 0 auto;
-    padding: 7px var(--space-md);
+    /* モードが4つ並んでも 360px 幅に収まる余白 */
+    padding: 7px 8px;
     font-size: 13px;
   }
+}
+
+/* --- 教材音声 --- */
+
+.stack-lg > * + * {
+  margin-top: var(--space-lg);
+}
+
+/* 下端に固定した操作パネルの分だけ、原稿の末尾を持ち上げる */
+.lessons {
+  padding-bottom: 140px;
+}
+
+/* レッスンの番号。10個が1行に収まる幅にし、どれも1回のタップで選べる */
+.lesson-grid {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: var(--space-xs);
+}
+.lesson-cell {
+  min-height: 44px;
+  padding: 0;
+  border-radius: var(--rounded-sm);
+  background: var(--color-surface-sunken);
+  color: var(--color-on-surface-muted);
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.lesson-cell.is-active {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+@media (max-width: 400px) {
+  .lesson-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.lesson-title {
+  font-size: 15px;
+  color: var(--color-on-surface-muted);
+}
+
+.track-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+/* 音声の種類と原稿の表示。速度の切り替えと同じ形で、押しやすい高さにする */
+.track-btn {
+  background: transparent;
+  color: var(--color-on-surface-muted);
+  border-radius: var(--rounded-full);
+  min-height: 36px;
+  padding: 0 var(--space-md);
+  font-size: 14px;
+  font-weight: 600;
+}
+.track-btn.is-active {
+  background: var(--color-secondary);
+  color: var(--color-on-secondary);
+}
+
+/* 原稿。1文が1つのボタンで、押すとその文の頭から鳴る */
+.lines {
+  list-style: none;
+  margin-left: calc(var(--space-sm) * -1);
+  margin-right: calc(var(--space-sm) * -1);
+  padding: 0;
+}
+.line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-sm);
+  background: transparent;
+  color: var(--color-on-surface);
+  border-radius: var(--rounded-md);
+  text-align: left;
+}
+/* いま鳴っている文は文字を青くする。地の色は変えない。
+   色だけに頼らないよう、太字も併せる */
+.line.is-active .line-en,
+.line.is-active .line-ja,
+.line.is-active .line-no {
+  color: var(--color-primary);
+}
+.line-no {
+  flex: 0 0 26px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.7;
+  color: var(--color-on-surface);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.line-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.line-en {
+  font-size: 18px;
+  line-height: 1.7;
+}
+.line.is-active .line-en {
+  font-weight: 600;
+}
+.line-ja {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--color-on-surface-muted);
+}
+.line-hidden {
+  font-size: 14px;
+  color: var(--color-on-surface-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 操作パネル。原稿をどこまで読んでいても同じ場所にある */
+.player {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-outline);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.player-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.player-seek {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.player-time {
+  flex: 0 0 auto;
+  min-width: 34px;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-on-surface-muted);
+}
+.player-seek input[type="range"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 28px;
+  margin: 0;
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+.player-seek input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: var(--rounded-full);
+  background: linear-gradient(
+    to right,
+    var(--color-primary) var(--fill, 0%),
+    var(--color-outline) var(--fill, 0%)
+  );
+}
+.player-seek input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+.player-seek input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: var(--rounded-full);
+  background: var(--color-outline);
+}
+.player-seek input[type="range"]::-moz-range-progress {
+  height: 6px;
+  border-radius: var(--rounded-full);
+  background: var(--color-primary);
+}
+.player-seek input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+
+.player-main {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.5fr 1fr 1fr;
+  gap: var(--space-xs);
+  align-items: stretch;
+}
+/* アイコンの下に必ず文字を置く。何が起きるかを推測させない */
+.player-btn,
+.player-play {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 56px;
+  padding: 6px 2px;
+  border-radius: var(--rounded-md);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.player-btn {
+  background: var(--color-secondary);
+  color: var(--color-on-secondary);
+}
+.player-play {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+.player-btn svg,
+.player-play svg {
+  width: 20px;
+  height: 20px;
+}
+
+.lessons button:focus-visible,
+.lessons select:focus-visible,
+.lessons input:focus-visible {
+  outline: 2px solid var(--color-on-surface);
+  outline-offset: 2px;
+}
+/* 番号つきの短文は、番号の変わり目を余白で区切る */
+.lines li.is-item-start {
+  margin-top: var(--space-md);
+}
+
+/* --- 教材音声のログイン --- */
+.login {
+  max-width: 360px;
+}
+.login-label {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+}
+.login-input {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 var(--space-md);
+  border: 1px solid var(--color-on-surface-muted);
+  border-radius: var(--rounded-sm);
+  background: var(--color-surface);
+  color: var(--color-on-surface);
+  font-family: inherit;
+  /* iOS は 16px 未満の入力欄に触れると画面を拡大する */
+  font-size: 16px;
+}
+.login-input:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
 }
