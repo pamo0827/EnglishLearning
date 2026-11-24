@@ -366,16 +366,19 @@ export function Lessons({ lessonKey }: { lessonKey: CryptoKey }) {
     setPlaying(false);
   };
 
-  // 鳴っている文が画面の外へ出たら、見える位置まで原稿を送る
+  // 鳴っている文を、いつも見えている範囲の真ん中に置く。
+  // 見えている範囲は、画面の上端から下端の操作パネルの上まで。
   useEffect(() => {
     if (!playing) return;
     const el = lineRefs.current[active];
     if (!el) return;
+    const panel = document.querySelector<HTMLElement>(".player");
+    const visible = window.innerHeight - (panel?.offsetHeight ?? 0);
     const rect = el.getBoundingClientRect();
-    const bottomLimit = window.innerHeight - 150; // 下端の操作パネルに隠れる分
-    if (rect.top < 16 || rect.bottom > bottomLimit) {
-      el.scrollIntoView({ block: "center", behavior: "smooth" });
-    }
+    const delta = rect.top + rect.height / 2 - visible / 2;
+    if (Math.abs(delta) < 4) return;
+    // この画面では body の中を送っている（globals.css の lessons-shell）
+    document.body.scrollBy({ top: delta, behavior: "smooth" });
   }, [active, playing, trackId]);
 
   // キーボード。原稿を見たまま手元だけで操作できるようにする
